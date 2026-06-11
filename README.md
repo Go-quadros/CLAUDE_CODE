@@ -1,5 +1,7 @@
 # CLAUDE_CODE
 
+[![GitHub license](https://img.shields.io/github/license/Go-quadros/CLAUDE_CODE)](https://github.com/Go-quadros/CLAUDE_CODE)
+
 Repositório de experimentos e aprendizado com Claude Code.
 
 ## O que é este projeto?
@@ -9,7 +11,10 @@ Este repositório foi criado para explorar as capacidades do Claude Code — a C
 ## Como começar
 
 1. Instale o [Claude Code](https://claude.ai/code)
-2. Clone este repositório
+2. Clone este repositório:
+   ```bash
+   git clone https://github.com/Go-quadros/CLAUDE_CODE.git
+   ```
 3. Explore os exemplos na pasta do projeto
 
 ## Contribuindo
