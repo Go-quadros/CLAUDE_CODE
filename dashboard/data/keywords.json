@@ -1,0 +1,802 @@
+﻿{
+  "materiais": [
+    {
+      "term": "Quadros Decorativos",
+      "vol": 184535
+    },
+    {
+      "term": "Quadro Decorativo",
+      "vol": 58923
+    },
+    {
+      "term": "Quadro Grande para Sala",
+      "vol": 54466
+    },
+    {
+      "term": "Quadro com Moldura e Vidro",
+      "vol": 36098
+    },
+    {
+      "term": "Quadro Decorativo Sala Grande",
+      "vol": 33646
+    },
+    {
+      "term": "Quadros Decorativos com Moldura",
+      "vol": 33550
+    },
+    {
+      "term": "Quadro Decorativo Sala com Moldura",
+      "vol": 21818
+    },
+    {
+      "term": "Quadro com Moldura",
+      "vol": 18709
+    },
+    {
+      "term": "Kit Quadros Decorativos",
+      "vol": 18271
+    },
+    {
+      "term": "Quadros Grandes Decorativos Sala",
+      "vol": 17959
+    },
+    {
+      "term": "Quadro com Moldura para Sala",
+      "vol": 17263
+    },
+    {
+      "term": "Quadro para Sala Grande",
+      "vol": 16667
+    },
+    {
+      "term": "Trio de Quadros Decorativos",
+      "vol": 10463
+    },
+    {
+      "term": "Quadros para Sala com Moldura",
+      "vol": 9398
+    },
+    {
+      "term": "Quadro Grande para Quarto",
+      "vol": 9098
+    },
+    {
+      "term": "Quadro Decorativo Sala com Moldura e Vidro",
+      "vol": 7263
+    },
+    {
+      "term": "Quadro Decorativo Grande",
+      "vol": 6399
+    },
+    {
+      "term": "Quadro Decorativo com Moldura e Vidro",
+      "vol": 5695
+    },
+    {
+      "term": "Quadro com Moldura para Quarto",
+      "vol": 4932
+    },
+    {
+      "term": "Quadro com Vidro e Moldura",
+      "vol": 4928
+    },
+    {
+      "term": "Kit 3 Quadros Decorativos",
+      "vol": 4918
+    },
+    {
+      "term": "Quadro Grande Com Moldura",
+      "vol": 4569
+    },
+    {
+      "term": "Quadro de Sala Grande com Moldura",
+      "vol": 4298
+    },
+    {
+      "term": "Quadro de Parede Decorativo",
+      "vol": 3562
+    },
+    {
+      "term": "Quadro com Moldura e Vidro Grande",
+      "vol": 2926
+    },
+    {
+      "term": "Quadro Decorativo Com Moldura",
+      "vol": 2278
+    },
+    {
+      "term": "Quadro Grande com Moldura para Sala",
+      "vol": 1615
+    },
+    {
+      "term": "Kit 2 Quadros Decorativos",
+      "vol": 1320
+    },
+    {
+      "term": "Dupla de Quadros Decorativos",
+      "vol": 1129
+    }
+  ],
+  "lugares1": [
+    {
+      "term": "Quadro Decorativo Sala",
+      "vol": 925555
+    },
+    {
+      "term": "Quadros Decorativos Quarto",
+      "vol": 530734
+    },
+    {
+      "term": "Quadro para Quarto Casal",
+      "vol": 86056
+    },
+    {
+      "term": "Quadros Decorativos Quarto Menina",
+      "vol": 49965
+    },
+    {
+      "term": "Quadros Decorativos para Sala",
+      "vol": 39619
+    },
+    {
+      "term": "Quadro Decorativo Quarto Casal",
+      "vol": 28524
+    },
+    {
+      "term": "Quadro Quarto Casal",
+      "vol": 18074
+    },
+    {
+      "term": "Quadro de Sala Decorativo",
+      "vol": 12313
+    },
+    {
+      "term": "Quadro de Parede para Sala",
+      "vol": 11879
+    },
+    {
+      "term": "Quadros Decorativos Quarto Feminino",
+      "vol": 11532
+    },
+    {
+      "term": "Quadro pra Quarto de Casal",
+      "vol": 11345
+    },
+    {
+      "term": "Quadros Decorativos Quarto Menino",
+      "vol": 10943
+    },
+    {
+      "term": "Quadro para Quarto Feminino",
+      "vol": 10664
+    },
+    {
+      "term": "Quadro para Quarto Casal Cabeceira",
+      "vol": 9051
+    },
+    {
+      "term": "Quadro Decorativo Quarto",
+      "vol": 8694
+    },
+    {
+      "term": "Quadro para Sala de Jantar",
+      "vol": 8065
+    },
+    {
+      "term": "Quadro para Sala de Estar",
+      "vol": 7312
+    },
+    {
+      "term": "Kit Quadros Decorativos Sala",
+      "vol": 7117
+    },
+    {
+      "term": "Kit Quadros Decorativos Quarto",
+      "vol": 6762
+    },
+    {
+      "term": "Quadro Decorativo para Quarto",
+      "vol": 6528
+    },
+    {
+      "term": "Quadro para Quarto Masculino",
+      "vol": 5993
+    },
+    {
+      "term": "Quadros Decorativos Sala de Jantar",
+      "vol": 5359
+    },
+    {
+      "term": "Quadro Quarto Feminino",
+      "vol": 4937
+    },
+    {
+      "term": "Quadros Decorativos Quarto Grande",
+      "vol": 4863
+    },
+    {
+      "term": "Quadro de Parede para Quarto",
+      "vol": 4488
+    },
+    {
+      "term": "Quadro Decorativo para Sala",
+      "vol": 3710
+    },
+    {
+      "term": "Quadro Decoração Quarto",
+      "vol": 3397
+    },
+    {
+      "term": "Quadro Decoração Sala",
+      "vol": 3195
+    },
+    {
+      "term": "Quadros Decorativos Quarto Casal",
+      "vol": 3050
+    },
+    {
+      "term": "Quadro Decorativo Quarto Bebe",
+      "vol": 2828
+    },
+    {
+      "term": "Quadro Para Quarto Infantil",
+      "vol": 1540
+    },
+    {
+      "term": "Quadro Decorativo Quarto Bebe Menino",
+      "vol": 910
+    }
+  ],
+  "lugares2": [
+    {
+      "term": "Quadro Decorativo Infantil",
+      "vol": 51518
+    },
+    {
+      "term": "Quadro para Cozinha",
+      "vol": 16047
+    },
+    {
+      "term": "Quadros para Cozinha Decorativo",
+      "vol": 15267
+    },
+    {
+      "term": "Quadros Cozinha Decorativo",
+      "vol": 13378
+    },
+    {
+      "term": "Quadro para Banheiro",
+      "vol": 11064
+    },
+    {
+      "term": "Quadro Banheiro",
+      "vol": 9050
+    },
+    {
+      "term": "Quadro Infantil",
+      "vol": 6311
+    },
+    {
+      "term": "Quadro Decorativo para Cozinha",
+      "vol": 5559
+    },
+    {
+      "term": "Quadro para Salão de Beleza",
+      "vol": 4952
+    },
+    {
+      "term": "Quadro para Corredor de Casa",
+      "vol": 4916
+    },
+    {
+      "term": "Quadro para Cozinha Decoração",
+      "vol": 4606
+    },
+    {
+      "term": "Quadro Decorativo Escritório",
+      "vol": 4590
+    },
+    {
+      "term": "Quadro Barbearia",
+      "vol": 4000
+    },
+    {
+      "term": "Quadro Decorativo Infantil Menina",
+      "vol": 3625
+    },
+    {
+      "term": "Quadro para Escritório",
+      "vol": 3410
+    },
+    {
+      "term": "Quadro Escritório",
+      "vol": 3173
+    },
+    {
+      "term": "Quadro Decorativo Infantil Menino",
+      "vol": 2974
+    },
+    {
+      "term": "Quadro Decorativo Salão de Beleza",
+      "vol": 2959
+    },
+    {
+      "term": "Quadro Lavanderia",
+      "vol": 2929
+    },
+    {
+      "term": "Quadro Salão de Beleza",
+      "vol": 2748
+    },
+    {
+      "term": "Quadro para Corredor",
+      "vol": 2646
+    },
+    {
+      "term": "Quadros para Barbearia",
+      "vol": 2341
+    },
+    {
+      "term": "Quadro para Lavanderia",
+      "vol": 2302
+    },
+    {
+      "term": "Kit Quadro Decorativo Infantil",
+      "vol": 2107
+    },
+    {
+      "term": "Quadro Area Gourmet",
+      "vol": 1838
+    },
+    {
+      "term": "Quadro Estetica",
+      "vol": 1775
+    },
+    {
+      "term": "Quadro Manicure",
+      "vol": 1650
+    },
+    {
+      "term": "Quadro para Lavabo",
+      "vol": 1438
+    },
+    {
+      "term": "Quadro Decorativo Estetica",
+      "vol": 1222
+    },
+    {
+      "term": "Quadros Decorativos Manicure",
+      "vol": 1210
+    },
+    {
+      "term": "Quadro para Escritório Decoração",
+      "vol": 1038
+    },
+    {
+      "term": "Quadro Decorativo Estetica Clinica",
+      "vol": 668
+    },
+    {
+      "term": "Quadro Decorativos Area Gourmet",
+      "vol": 8
+    }
+  ],
+  "categorias": [
+    {
+      "term": "Quadro Leão de Juda Grande",
+      "vol": 11447
+    },
+    {
+      "term": "Quadro Santa Ceia Grande",
+      "vol": 11158
+    },
+    {
+      "term": "Quadro de Leao para Sala",
+      "vol": 10065
+    },
+    {
+      "term": "Quadro Santa Ceia",
+      "vol": 8016
+    },
+    {
+      "term": "Quadro Leão",
+      "vol": 7754
+    },
+    {
+      "term": "Quadro Jesus",
+      "vol": 6795
+    },
+    {
+      "term": "Quadro Jesus Cristo",
+      "vol": 6474
+    },
+    {
+      "term": "Quadro Salmo 91 para Parede",
+      "vol": 5360
+    },
+    {
+      "term": "Quadro Cristão",
+      "vol": 4639
+    },
+    {
+      "term": "Quadro Leão de Juda",
+      "vol": 4516
+    },
+    {
+      "term": "Quadro de Jesus para Sala",
+      "vol": 4409
+    },
+    {
+      "term": "Quadro Jesus Misericordioso",
+      "vol": 4361
+    },
+    {
+      "term": "Quadro Leao",
+      "vol": 4101
+    },
+    {
+      "term": "Quadro de Jesus",
+      "vol": 3886
+    },
+    {
+      "term": "Quadro Decorativo Sala Leão",
+      "vol": 3714
+    },
+    {
+      "term": "Quadro do Leão de Judá",
+      "vol": 3419
+    },
+    {
+      "term": "Quadro de Leão",
+      "vol": 3027
+    },
+    {
+      "term": "Quadro com Frases Biblicas",
+      "vol": 2810
+    },
+    {
+      "term": "Quadro Nunca Foi Sorte Sempre Foi Deus",
+      "vol": 2781
+    },
+    {
+      "term": "Quadro de Leão Com Moldura",
+      "vol": 2651
+    },
+    {
+      "term": "Quadros Religiosos Decorativos",
+      "vol": 2372
+    },
+    {
+      "term": "Quadro da Santa Ceia",
+      "vol": 2341
+    },
+    {
+      "term": "Quadros com Versículos Bíblicos",
+      "vol": 2236
+    },
+    {
+      "term": "Quadro Religioso",
+      "vol": 2208
+    },
+    {
+      "term": "Quadro Leão Família",
+      "vol": 2043
+    },
+    {
+      "term": "Quadro Versículo Bíblico",
+      "vol": 1824
+    },
+    {
+      "term": "Quadro de Leao",
+      "vol": 1739
+    },
+    {
+      "term": "Quadro de Jesus Cristo Grande",
+      "vol": 1699
+    },
+    {
+      "term": "Quadro Família de Leão",
+      "vol": 1615
+    },
+    {
+      "term": "Quadro Jesus Misericordioso Grande",
+      "vol": 1407
+    },
+    {
+      "term": "Quadros Decorativos Cristão",
+      "vol": 1387
+    },
+    {
+      "term": "Quadro Biblico",
+      "vol": 1236
+    },
+    {
+      "term": "Quadro Decorativo Religioso",
+      "vol": 1091
+    },
+    {
+      "term": "Quadro Santa Ceia para Cozinha",
+      "vol": 1021
+    }
+  ],
+  "categorias2": [
+    {
+      "term": "Quadro Família",
+      "vol": 7469
+    },
+    {
+      "term": "Quadro Abstrato Para Sala",
+      "vol": 6121
+    },
+    {
+      "term": "Quadro Minimalista",
+      "vol": 5472
+    },
+    {
+      "term": "Quadro Cantinho Do Café",
+      "vol": 5197
+    },
+    {
+      "term": "Quadro Arvore da Vida",
+      "vol": 4626
+    },
+    {
+      "term": "Quadro Vintage",
+      "vol": 4614
+    },
+    {
+      "term": "Quadro Van Gogh",
+      "vol": 4421
+    },
+    {
+      "term": "Quadro Abstrato",
+      "vol": 4062
+    },
+    {
+      "term": "Quadro Árvore da Vida Grande",
+      "vol": 3815
+    },
+    {
+      "term": "Quadro Vintage com Moldura",
+      "vol": 3616
+    },
+    {
+      "term": "Quadros Modernos para Sala",
+      "vol": 3383
+    },
+    {
+      "term": "Quadro Moderno",
+      "vol": 3265
+    },
+    {
+      "term": "Quadro Preto e Branco",
+      "vol": 3238
+    },
+    {
+      "term": "Quadro Minimalista com Moldura",
+      "vol": 3024
+    },
+    {
+      "term": "Quadro Familia",
+      "vol": 2582
+    },
+    {
+      "term": "Quadro Café",
+      "vol": 2478
+    },
+    {
+      "term": "Quadro de Carro",
+      "vol": 2439
+    },
+    {
+      "term": "Quadro da Família",
+      "vol": 2098
+    },
+    {
+      "term": "Quadro Familia Decorativo Sala",
+      "vol": 2023
+    },
+    {
+      "term": "Quadro Minimalista Decorativo",
+      "vol": 1898
+    },
+    {
+      "term": "Quadro Vintage Decorativo",
+      "vol": 1697
+    },
+    {
+      "term": "Quadro Decorativo Árvore da Vida",
+      "vol": 1655
+    },
+    {
+      "term": "Quadro Abstrato Grande",
+      "vol": 1604
+    },
+    {
+      "term": "Quadro Preto e Branco com Moldura",
+      "vol": 1546
+    },
+    {
+      "term": "Quadro Árvore da Vida com Moldura",
+      "vol": 1499
+    },
+    {
+      "term": "Quadro Decorativo Família",
+      "vol": 1454
+    },
+    {
+      "term": "Quadro da Família Decoração",
+      "vol": 1447
+    },
+    {
+      "term": "Quadros de Carros Esportivos",
+      "vol": 1442
+    },
+    {
+      "term": "Quadro Decorativo Abstrato",
+      "vol": 1414
+    },
+    {
+      "term": "Quadro Carro",
+      "vol": 1383
+    },
+    {
+      "term": "Quadro Árvore da Vida",
+      "vol": 1341
+    },
+    {
+      "term": "Quadro Decorativo Minimalista",
+      "vol": 1201
+    },
+    {
+      "term": "Quadros Modernos Decorativos",
+      "vol": 1181
+    },
+    {
+      "term": "Quadro Porsche",
+      "vol": 1033
+    },
+    {
+      "term": "Quadro Decorativo Carro",
+      "vol": 952
+    },
+    {
+      "term": "Quadro Maternidade",
+      "vol": 944
+    }
+  ],
+  "categorias3": [
+    {
+      "term": "Mapa Mundi Parede",
+      "vol": 6336
+    },
+    {
+      "term": "Quadros com Frases Motivacionais",
+      "vol": 3434
+    },
+    {
+      "term": "Quadro Motivacional",
+      "vol": 2795
+    },
+    {
+      "term": "Quadro de Gatos Decorativo",
+      "vol": 2752
+    },
+    {
+      "term": "Quadro Mapa Mundi",
+      "vol": 2386
+    },
+    {
+      "term": "Quadro Gato",
+      "vol": 2381
+    },
+    {
+      "term": "Quadro Boho Chic",
+      "vol": 2310
+    },
+    {
+      "term": "Quadro Paisagem",
+      "vol": 2302
+    },
+    {
+      "term": "Quadro Frases Motivacionais",
+      "vol": 2066
+    },
+    {
+      "term": "Mapa Mundi Decoração",
+      "vol": 1905
+    },
+    {
+      "term": "Quadro Praia",
+      "vol": 1844
+    },
+    {
+      "term": "Quadro Mar",
+      "vol": 1734
+    },
+    {
+      "term": "Quadro de Flores",
+      "vol": 1706
+    },
+    {
+      "term": "Quadro Boho",
+      "vol": 1648
+    },
+    {
+      "term": "Quadro Dourado",
+      "vol": 1619
+    },
+    {
+      "term": "Quadro Motivacional Decorativo",
+      "vol": 1608
+    },
+    {
+      "term": "Quadro Feminino para Quarto",
+      "vol": 1525
+    },
+    {
+      "term": "Quadro Rio de Janeiro",
+      "vol": 1491
+    },
+    {
+      "term": "Quadro Brasilidades",
+      "vol": 1491
+    },
+    {
+      "term": "Quadro Folhagem com Moldura",
+      "vol": 1466
+    },
+    {
+      "term": "Quadro Folhagem",
+      "vol": 1418
+    },
+    {
+      "term": "Quadro Mosaico",
+      "vol": 1300
+    },
+    {
+      "term": "Quadro Com Frases",
+      "vol": 1252
+    },
+    {
+      "term": "Quadro Mapa Mundi Grande",
+      "vol": 1239
+    },
+    {
+      "term": "Quadro de Gato",
+      "vol": 1199
+    },
+    {
+      "term": "Quadro Feminino",
+      "vol": 1175
+    },
+    {
+      "term": "Quadro Aguia",
+      "vol": 1131
+    },
+    {
+      "term": "Quadro Natureza",
+      "vol": 1098
+    },
+    {
+      "term": "Quadro de Flores com Moldura",
+      "vol": 1092
+    },
+    {
+      "term": "Quadro de Flores para Sala",
+      "vol": 874
+    },
+    {
+      "term": "Quadro Aguia Grande",
+      "vol": 803
+    },
+    {
+      "term": "Quadro Dente de Leão",
+      "vol": 570
+    },
+    {
+      "term": "Quadro de Águia",
+      "vol": 569
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+# Segredos e credenciais — NUNCA subir pro GitHub
+dashboard/.env
+.env
+dashboard/data/tokens.json
+dashboard/data/users.json
+
+# Cache do Python
+__pycache__/
+*.pyc
+*.pyo
+dashboard/__pycache__/
+
+# Arquivos temporários do sistema
+.DS_Store
+Thumbs.db

@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Go Quadros — Marketplaces</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F5F3EE;
+      --surface: #FFFFFF;
+      --surface2: #EFEDE7;
+      --border: #D8D4CA;
+      --text: #1A1916;
+      --muted: #7A7770;
+      --accent: #2C6B4F;
+      --accent-light: #E3EFE9;
+      --danger: #9B2C2C;
+      --teal: #1A5F7A;
+      --amber: #7A5000;
+      --amber-light: #FEF3DA;
+      --font-display: 'DM Sans', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+      --sidebar: 220px;
+    }
+
+    body {
+      font-family: var(--font-display);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar);
+      min-height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 10;
+    }
+
+    .sidebar-brand {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-brand .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .sidebar-brand .brand-badge::before {
+      content: '';
+      width: 5px; height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+    .sidebar-brand h2 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .sidebar-nav {
+      padding: 16px 12px;
+      flex: 1;
+    }
+    .nav-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 8px;
+      margin-bottom: 6px;
+      margin-top: 16px;
+    }
+    .nav-label:first-child { margin-top: 0; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+    .nav-item:hover { background: var(--bg); color: var(--text); }
+    .nav-item.active { background: var(--accent-light); color: var(--accent); }
+    .nav-icon {
+      width: 16px; height: 16px;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+    .nav-item.active .nav-icon { opacity: 1; }
+
+    /* ── Main ── */
+    .main {
+      margin-left: var(--sidebar);
+      flex: 1;
+      padding: 32px 36px;
+      min-height: 100vh;
+    }
+
+    /* ── Screens ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── Page header ── */
+    .page-header { margin-bottom: 28px; }
+    .page-header .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .page-header .badge::before {
+      content: '';
+      width: 5px; height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+    .page-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+    .page-header p { font-size: 13px; color: var(--muted); font-weight: 300; }
+
+    /* ── Connection cards ── */
+    .accounts { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+    .account-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .account-info h3 { font-size: 13px; font-weight: 600; }
+    .account-info p { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: var(--font-mono); }
+
+    .connect-badge {
+      padding: 4px 11px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      border: none;
+    }
+    .connect-badge.connected { background: var(--accent-light); color: var(--accent); }
+    .connect-badge.disconnected { background: var(--amber-light); color: var(--amber); }
+
+    /* ── Filters ── */
+    .filters {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; }
+    .filter-group label { font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0.02em; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    select, input[type="text"] {
+      height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      font-family: var(--font-display);
+      font-size: 13px;
+      color: var(--text);
+      padding: 0 10px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A7770' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+    select:focus, input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(44,107,79,0.1);
+    }
+
+    .btn {
+      height: 38px;
+      padding: 0 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font-display);
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-ghost { background: var(--surface2); color: var(--text); }
+
+    /* ── Stats ── */
+    .stats { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      flex: 1;
+      min-width: 130px;
+    }
+    .stat-card .number {
+      font-family: var(--font-mono);
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .stat-card .label { font-size: 11px; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--surface2); }
+    thead th {
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--bg); }
+    tbody td { padding: 12px 16px; font-size: 13px; vertical-align: middle; }
+
+    .product-cell { display: flex; align-items: center; gap: 12px; }
+    .product-cell img {
+      width: 44px; height: 44px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .product-cell .img-placeholder {
+      width: 44px; height: 44px;
+      border-radius: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .product-title { font-weight: 500; line-height: 1.35; max-width: 240px; font-size: 13px; }
+    .no-clip-tag {
+      display: inline-block;
+      background: var(--amber-light);
+      color: var(--amber);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-top: 4px;
+      letter-spacing: 0.03em;
+    }
+
+    .channel-tag {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .ch-freewall { background: #E8F0FE; color: #1A5CE8; }
+    .ch-goquadros { background: var(--accent-light); color: var(--accent); }
+
+    .attr-list { font-size: 12px; color: var(--muted); line-height: 1.7; font-family: var(--font-mono); }
+    .attr-row { display: flex; gap: 4px; }
+    .attr-key { color: var(--border); font-size: 10px; }
+
+    .mono { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+
+    .table-empty { text-align: center; padding: 56px 20px; }
+    .table-empty .empty-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+    .table-empty p { font-size: 13px; color: var(--muted); }
+
+    .loading-state { text-align: center; padding: 56px; color: var(--muted); font-size: 13px; }
+
+    /* ── Relatorios ── */
+    .field-label { display:block;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px }
+    .field-input { width:100%;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--bg);font-family:var(--font-display);font-size:13px;color:var(--text);padding:0 10px;outline:none }
+    .field-input:focus { border-color:var(--accent);box-shadow:0 0 0 3px rgba(44,107,79,0.1) }
+    .comp-delta-pos { color:#2C6B4F;font-weight:500 }
+    .comp-delta-neg { color:#9B2C2C;font-weight:500 }
+    #comp-table-visual td { padding: 8px 16px; line-height: 1.3 }
+    #comp-table-visual td span { display:inline-block; margin-top: 1px }
+
+    /* ── Calculator screen ── */
+    .calc-wrap { max-width: 520px; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .card-title {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+
+    .field label { font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.02em; text-transform: none; }
+    .label-row { display: flex; align-items: center; justify-content: space-between; }
+
+    .toggle {
+      display: flex;
+      background: var(--surface2);
+      border-radius: 6px;
+      padding: 2px;
+      gap: 2px;
+    }
+    .toggle button {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 9px;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      line-height: 1;
+    }
+    .toggle button.active {
+      background: var(--surface);
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+
+    .input-wrap { position: relative; }
+    .input-prefix {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 13px; color: var(--muted); font-family: var(--font-mono); pointer-events: none;
+    }
+    .input-suffix {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 13px; color: var(--muted); font-family: var(--font-mono); pointer-events: none;
+    }
+
+    input[type="number"] {
+      width: 100%; height: 44px;
+      border: 1px solid var(--border); border-radius: 10px;
+      background: var(--bg); font-family: var(--font-mono); font-size: 14px; color: var(--text);
+      padding: 0 12px 0 36px; outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input[type="number"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(44,107,79,0.12); }
+    input.has-suffix { padding-right: 32px; }
+
+    .calc-wrap select {
+      width: 100%; height: 44px;
+      border: 1px solid var(--border); border-radius: 10px;
+      background: var(--bg); font-family: var(--font-display); font-size: 14px; color: var(--text);
+      padding: 0 12px; outline: none; cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A7770' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      box-shadow: none;
+    }
+    .calc-wrap select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(44,107,79,0.12); }
+
+    .cmv-display {
+      height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 8px;
+    }
+    .cmv-display .cmv-label { font-size: 12px; color: var(--muted); flex: 1; }
+    .cmv-display .cmv-value {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--accent);
+      transition: opacity 0.2s;
+    }
+    .cmv-display .cmv-value.empty { color: var(--muted); font-weight: 400; font-size: 13px; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+
+    .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+    .metric { background: var(--surface2); border-radius: 12px; padding: 14px 16px; }
+    .metric.highlight { background: var(--accent); grid-column: 1 / -1; }
+    .metric.danger-bg { background: var(--danger); grid-column: 1 / -1; }
+
+    .metric-label { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .metric.highlight .metric-label, .metric.danger-bg .metric-label { color: rgba(255,255,255,0.65); }
+    .metric-value { font-family: var(--font-mono); font-size: 22px; font-weight: 500; color: var(--text); }
+    .metric.highlight .metric-value, .metric.danger-bg .metric-value { color: #fff; font-size: 28px; }
+    .metric-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: var(--font-mono); }
+    .metric.highlight .metric-sub, .metric.danger-bg .metric-sub { color: rgba(255,255,255,0.65); }
+
+    .breakdown-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .bar-name { font-size: 12px; color: var(--muted); width: 140px; flex-shrink: 0; text-align: right; }
+    .bar-track { flex: 1; height: 8px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 99px; transition: width 0.35s cubic-bezier(.4,0,.2,1); }
+    .bar-pct { font-family: var(--font-mono); font-size: 12px; font-weight: 500; width: 44px; text-align: right; }
+
+    .calc-empty { text-align: center; padding: 2rem 0; color: var(--muted); font-size: 14px; }
+
+    /* ── Last update ── */
+    .last-update { font-size: 11px; color: var(--muted); font-family: var(--font-mono); margin-left: auto; }
+    .filters-right { display: flex; align-items: flex-end; gap: 8px; margin-left: auto; }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-badge">Go Quadros</div>
+    <h2>Marketplaces</h2>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Ferramentas</div>
+    <button class="nav-item active" onclick="showScreen('pedidos', this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+      </svg>
+      Pedidos sem clips
+    </button>
+    <button class="nav-item" onclick="showScreen('calculadora', this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
+        <line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+      </svg>
+      Calculadora de margem
+    </button>
+    <button class="nav-item" onclick="showScreen('relatorios', this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      Relat&oacute;rios semanais
+    </button>
+
+    <div class="nav-label">Contas</div>
+    {% for key, acc in accounts.items() %}
+    <button class="nav-item" style="cursor:default">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+      <span style="flex:1;font-size:12px">{{ acc.name }}</span>
+      {% if connected[key] %}
+        <span style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--accent)"></span>
+          <a href="/connect/{{ key }}" style="font-size:10px;color:var(--muted);text-decoration:none" title="Reconectar">↻</a>
+        </span>
+      {% else %}
+        <a href="/connect/{{ key }}" style="font-size:10px;color:var(--amber);font-weight:600;text-decoration:none">Conectar</a>
+      {% endif %}
+    </button>
+    {% endfor %}
+
+    {% if user_role == 'master' %}
+    <div class="nav-label">Administracao</div>
+    <button class="nav-item" onclick="showScreen('usuarios', this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+      </svg>
+      Colaboradores
+    </button>
+    <button class="nav-item" onclick="showScreen('importar', this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      Importar lista
+    </button>
+    <button class="nav-item" onclick="showScreen('medidas', this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+      </svg>
+      Medidas e peso
+    </button>
+    <button class="nav-item" onclick="showScreen('titulos', this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+      </svg>
+      Gerador de t&iacute;tulos
+    </button>
+    {% endif %}
+  </nav>
+
+  <div style="padding: 16px 12px; border-top: 1px solid var(--border); margin-top: auto;">
+    <div style="font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 2px;">{{ user_name }}</div>
+    <div style="font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;">{{ user_role }}</div>
+    <a href="/logout" style="font-size: 12px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 6px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+      </svg>
+      Sair
+    </a>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- Screen: Pedidos -->
+  <div class="screen active" id="screen-pedidos">
+    <div class="page-header">
+      <div class="badge">Produ&ccedil;&atilde;o de Conte&uacute;do</div>
+      <h1>Pedidos pagos<br>sem clips</h1>
+      <p>Selecione os produtos para gravar conteúdo e adicionar nos anúncios</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Per&iacute;odo</label>
+        <div style="display:flex;gap:6px">
+          <button id="btn-hoje" onclick="setPeriodo('hoje')" class="btn btn-ghost" style="height:38px;padding:0 16px;font-size:13px">Envios de hoje</button>
+          <button id="btn-proximos" onclick="setPeriodo('proximos')" class="btn btn-primary" style="height:38px;padding:0 16px;font-size:13px">Pr&oacute;ximos dias</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label>Conta</label>
+        <select id="filter-account" style="width:180px">
+          <option value="">Todas as contas</option>
+          <option value="Freewall Decoração">Freewall Decoração</option>
+          <option value="GQ Decoração">GQ Decoração</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Buscar</label>
+        <input type="text" id="search" placeholder="Nome, SKU ou ID..." style="width:200px" />
+      </div>
+      <div class="filters-right">
+        <span class="last-update" id="last-update"></span>
+        <button class="btn btn-primary" onclick="loadOrders()">Atualizar</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="number" id="stat-total">—</div>
+        <div class="label">Total sem clip</div>
+      </div>
+      <div class="stat-card">
+        <div class="number" id="stat-fw">—</div>
+        <div class="label">Freewall</div>
+      </div>
+      <div class="stat-card">
+        <div class="number" id="stat-gq">—</div>
+        <div class="label">GQ Decoração</div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <div id="loading" class="loading-state">Carregando pedidos...</div>
+      <table id="table" style="display:none">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>N. Pedido</th>
+            <th>ID Anuncio</th>
+            <th>SKU</th>
+            <th>Variacoes</th>
+            <th>Conta</th>
+            <th>Envio</th>
+            <th style="text-align:center">Qtd</th>
+            <th style="text-align:center">Acao</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div id="empty" class="table-empty" style="display:none">
+        <div class="empty-title">Nenhum pedido encontrado</div>
+        <p>Todos os anuncios pagos neste periodo ja possuem clip, ou as contas nao estao conectadas.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen: Calculadora -->
+  <div class="screen" id="screen-calculadora">
+    <div class="page-header">
+      <div class="badge">Mercado Livre</div>
+      <h1>Calculadora de margem<br>de contribui&ccedil;&atilde;o</h1>
+      <p>Preencha os campos para calcular automaticamente</p>
+    </div>
+
+    <div class="calc-wrap">
+      <div class="card">
+        <p class="card-title">Especificacoes do quadro</p>
+        <div class="fields">
+          <div class="field">
+            <label>Tipo de vidro</label>
+            <select id="vidro" onchange="updateCmv()">
+              <option value="">Selecione...</option>
+              <option value="sem">Sem vidro</option>
+              <option value="com">Com vidro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Quantidade</label>
+            <select id="qtd" onchange="updateCmv()">
+              <option value="">Selecione...</option>
+              <option value="avulso">Avulso</option>
+              <option value="dupla">Dupla</option>
+              <option value="trio">Trio</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label>Tamanho</label>
+            <select id="ctamanho" onchange="updateCmv()">
+              <option value="">Selecione...</option>
+              <option value="30x45">30x45 cm</option>
+              <option value="40x60">40x60 cm</option>
+              <option value="50x70">50x70 cm</option>
+              <option value="60x90">60x90 cm</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label>Custo de producao (CMV + embalagem)</label>
+            <div class="cmv-display">
+              <span class="cmv-label" id="cmv-label">Selecione as especificacoes acima</span>
+              <span class="cmv-value empty" id="cmv-value">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <p class="card-title">Dados do anuncio</p>
+        <div class="fields">
+          <div class="field full">
+            <label>Preco de venda</label>
+            <div class="input-wrap">
+              <span class="input-prefix">R$</span>
+              <input type="number" id="venda" placeholder="0,00" min="0" step="0.01" oninput="calc()">
+            </div>
+          </div>
+          <div class="field full">
+            <div class="label-row">
+              <label>Comissao da plataforma</label>
+              <div class="toggle">
+                <button id="btn-pct" class="active" onclick="setMode('pct')">%</button>
+                <button id="btn-rs" onclick="setMode('rs')">R$</button>
+              </div>
+            </div>
+            <div class="input-wrap">
+              <span class="input-prefix" id="comissao-prefix" style="display:none">R$</span>
+              <input type="number" id="comissao" class="has-suffix" placeholder="0" min="0" step="0.01" oninput="calc()">
+              <span class="input-suffix" id="comissao-suffix">%</span>
+            </div>
+          </div>
+          <div class="field full">
+            <label>Custo de frete</label>
+            <div class="input-wrap">
+              <span class="input-prefix">R$</span>
+              <input type="number" id="frete" placeholder="0,00" min="0" step="0.01" oninput="calc()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div id="calc-empty" class="calc-empty">
+          <p>Preencha o preco de venda para ver o resultado</p>
+        </div>
+        <div id="result-content" style="display:none">
+          <div class="results-grid" id="result-grid"></div>
+          <p class="breakdown-title">Composicao do preco de venda</p>
+          <div id="bars"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen: Usuarios (master only) -->
+  <div class="screen" id="screen-usuarios">
+    <div class="page-header">
+      <div class="badge">Administracao</div>
+      <h1>Colaboradores</h1>
+      <p>Gerencie quem tem acesso ao dashboard</p>
+    </div>
+
+    <div style="max-width:600px">
+      <div class="table-wrap" style="margin-bottom:20px">
+        <table id="users-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Usuario</th>
+              <th>Perfil</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="table-wrap" style="padding:20px">
+        <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:16px">Adicionar colaborador</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div>
+            <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:5px">Nome</label>
+            <input type="text" id="new-name" placeholder="Nome completo" style="width:100%;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--bg);font-family:var(--font-display);font-size:13px;color:var(--text);padding:0 10px;outline:none">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:5px">Usuario</label>
+            <input type="text" id="new-username" placeholder="login" style="width:100%;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--bg);font-family:var(--font-display);font-size:13px;color:var(--text);padding:0 10px;outline:none">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:5px">Senha</label>
+            <input type="password" id="new-password" placeholder="senha inicial" style="width:100%;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--bg);font-family:var(--font-display);font-size:13px;color:var(--text);padding:0 10px;outline:none">
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button class="btn btn-primary" style="height:38px;width:100%" onclick="addUser()">Adicionar</button>
+          </div>
+        </div>
+        <div id="users-msg" style="font-size:12px;color:var(--accent);display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-medidas">
+    <div class="page-header">
+      <div class="badge">Catálogo</div>
+      <h1>Medidas e peso</h1>
+      <p>Atualize as dimensões e peso dos anúncios diretamente no Mercado Livre</p>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+      <select id="medidas-account" style="height:38px;padding:0 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px">
+        <option value="">Selecione a conta...</option>
+        {% for key, acc in accounts.items() %}
+          {% if acc.platform == 'ml' and acc.get('seller_id') %}
+          <option value="{{ key }}">{{ acc.name }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+      <button id="btn-importar-anuncios" onclick="loadMedidas()" class="btn btn-primary" style="height:38px;padding:0 18px">Importar anúncios</button>
+      <input id="medidas-search" type="text" placeholder="Buscar por título ou ID..." oninput="renderMedidasTable()"
+        style="height:38px;padding:0 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;min-width:220px">
+      <span id="medidas-count" style="font-size:12px;color:var(--muted)"></span>
+      <button id="btn-salvar-medidas" onclick="salvarMedidas()" class="btn btn-primary" style="height:38px;padding:0 18px;margin-left:auto">Salvar alterações</button>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px;background:var(--surface2);border-radius:10px;margin-bottom:16px">
+      <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Busca por ID</span>
+      <input id="single-item-id" type="text" placeholder="MLB4827503119" style="height:34px;padding:0 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-family:var(--font-mono);font-size:12px;width:160px">
+      <button onclick="loadSingleItem()" class="btn btn-ghost" style="height:34px;padding:0 14px;font-size:12px">Buscar</button>
+      <div id="single-item-result" style="display:none;align-items:center;gap:10px;flex:1;flex-wrap:wrap">
+        <img id="single-thumb" src="" style="width:36px;height:36px;object-fit:cover;border-radius:4px">
+        <div style="flex:1;min-width:0">
+          <div id="single-title" style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+          <div id="single-dims" style="font-size:11px;color:var(--muted);font-family:var(--font-mono)"></div>
+        </div>
+        <input id="single-new-dims" type="text" placeholder="novas dimensões" style="height:34px;padding:0 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-family:var(--font-mono);font-size:12px;width:180px">
+        <button onclick="saveSingleItem()" class="btn btn-primary" style="height:34px;padding:0 14px;font-size:12px">Salvar</button>
+        <span id="single-status" style="font-size:12px;color:var(--accent)"></span>
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
+      Formato: <span style="font-family:var(--font-mono);font-size:11px;background:var(--surface2);padding:2px 8px;border-radius:4px">AlturaXLarguraXComprimento,PesoEmGramas</span>
+      &nbsp;— ex: <span style="font-family:var(--font-mono);font-size:11px">12x50x70,3000</span>
+    </div>
+    <div id="medidas-status" style="font-size:13px;color:var(--accent);margin-bottom:12px;min-height:18px"></div>
+
+    <div id="medidas-table-wrap" style="display:none">
+      <div class="table-wrap" style="overflow-x:auto">
+        <div id="medidas-table"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-importar">
+    <div class="page-header">
+      <div class="badge">Administracao</div>
+      <h1>Importar lista de anuncios sem clip</h1>
+      <p>Cole os IDs MLB dos anuncios sem clip exportados do painel do Mercado Livre</p>
+    </div>
+
+    <div style="max-width:600px">
+      <div class="table-wrap" style="padding:20px;margin-bottom:16px">
+        <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px">Como exportar do ML</p>
+        <ol style="font-size:13px;color:var(--muted);line-height:1.8;padding-left:18px">
+          <li>Acesse <span style="font-family:var(--font-mono);font-size:12px;background:var(--surface2);padding:1px 6px;border-radius:4px">mercadolibre.com.br/anuncios</span></li>
+          <li>Ative o filtro <strong>Sem clips publicados</strong></li>
+          <li>Clique em <strong>Alterar pelo Excel</strong> e baixe o arquivo</li>
+          <li>Abra o Excel, copie a coluna com os IDs <span style="font-family:var(--font-mono);font-size:12px">(MLB...)</span> e cole abaixo</li>
+        </ol>
+      </div>
+
+      <div class="table-wrap" style="padding:20px">
+        <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:10px">IDs dos anuncios (um por linha)</p>
+        <textarea id="import-ids" placeholder="MLB3595256381&#10;MLB4485057068&#10;MLB3695640777&#10;..." style="width:100%;height:200px;border:1px solid var(--border);border-radius:8px;background:var(--bg);font-family:var(--font-mono);font-size:12px;color:var(--text);padding:10px;outline:none;resize:vertical;line-height:1.6"></textarea>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
+          <button class="btn btn-primary" style="height:38px;padding:0 20px" onclick="importarLista()">Importar</button>
+          <span id="import-msg" style="font-size:13px;color:var(--accent);display:none"></span>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:12px">Os IDs importados ficam salvos. Novos imports somam aos existentes — nao substituem.</p>
+      </div>
+
+      <div class="table-wrap" style="padding:20px;margin-top:16px">
+        <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:10px">Marcar an&uacute;ncios como "j&aacute; tem clip"</p>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Cole os IDs de an&uacute;ncios para os quais voc&ecirc; j&aacute; subiu clips e que n&atilde;o aparecem nos pedidos di&aacute;rios</p>
+        <textarea id="remove-ids" placeholder="MLB3595256381&#10;MLB4485057068&#10;..." style="width:100%;height:160px;border:1px solid var(--border);border-radius:8px;background:var(--bg);font-family:var(--font-mono);font-size:12px;color:var(--text);padding:10px;outline:none;resize:vertical;line-height:1.6"></textarea>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
+          <button class="btn btn-primary" style="height:38px;padding:0 20px" onclick="marcarTemClipBulk()">Marcar como tem clip</button>
+          <span id="remove-msg" style="font-size:13px;color:var(--accent);display:none"></span>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="padding:20px;margin-top:16px" id="clips-status-box">
+        <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px">Status atual</p>
+        <p style="font-size:13px;color:var(--text)">An&uacute;ncios sem clip na whitelist: <strong id="clips-count">—</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Relatorios ── -->
+  <!-- Screen: Gerador de Títulos -->
+  <div class="screen" id="screen-titulos">
+    <div class="page-header">
+      <div class="badge">SEO</div>
+      <h1>Gerador de t&iacute;tulos</h1>
+      <p>Gera t&iacute;tulos otimizados por volume de busca, sem repetir t&iacute;tulos existentes</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:start">
+
+      <!-- Formulário -->
+      <div class="card" style="padding:20px;display:flex;flex-direction:column;gap:16px">
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">Plataforma</label>
+          <div style="display:flex;gap:8px">
+            <button id="tit-plat-ml" class="btn btn-primary" style="flex:1;height:34px;font-size:12px" onclick="setTitPlatform('ml')">Mercado Livre</button>
+            <button id="tit-plat-shp" class="btn btn-ghost" style="flex:1;height:34px;font-size:12px" onclick="setTitPlatform('shopee')">Shopee</button>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">Conta</label>
+          <select id="tit-conta" style="width:100%;height:34px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px">
+            <option value="nova_gq">GQ Decoração (Filete)</option>
+            <option value="freewall">Freewall Decoração (Caixinha)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">Estilo / Categoria <span style="font-weight:400;color:var(--muted)">(mais buscado — vai antes do tamanho no ML)</span></label>
+          <input id="tit-estilo" type="text" placeholder="Ex: Abstrato, Flores, Minimalista, Paisagem..." style="width:100%;height:34px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box"/>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">Nome da arte <span style="font-weight:400;color:var(--muted)">(diferencial — vai depois do tamanho no ML)</span></label>
+          <input id="tit-nome" type="text" placeholder="Ex: Monstera, Santa Ceia, Traços Dourado..." style="width:100%;height:34px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box"/>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">Quantidade</label>
+          <select id="tit-qtd" style="width:100%;height:34px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px">
+            <option value="avulso">Avulso</option>
+            <option value="duo">Duo (Kit)</option>
+            <option value="trio">Trio</option>
+          </select>
+        </div>
+        <div id="tit-tamanho-wrap">
+          <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">Tamanho</label>
+          <select id="tit-tamanho" style="width:100%;height:34px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px">
+            <option value="40x60">40x60</option>
+            <option value="50x70">50x70</option>
+            <option value="60x90">60x90</option>
+          </select>
+        </div>
+        <div id="tit-vidro-wrap">
+          <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">Acabamento</label>
+          <div style="display:flex;gap:8px">
+            <button id="tit-sv" class="btn btn-primary" style="flex:1;height:34px;font-size:12px" onclick="setTitVidro(false)">Sem vidro</button>
+            <button id="tit-cv" class="btn btn-ghost" style="flex:1;height:34px;font-size:12px" onclick="setTitVidro(true)">Com vidro</button>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="height:40px;font-size:13px;font-weight:600" onclick="gerarTitulos()">Gerar t&iacute;tulos</button>
+        <button class="btn btn-ghost" style="height:34px;font-size:12px" onclick="carregarExistentes()" id="tit-btn-existentes">Carregar t&iacute;tulos existentes</button>
+        <div id="tit-existentes-status" style="font-size:11px;color:var(--muted);text-align:center"></div>
+      </div>
+
+      <!-- Resultados -->
+      <div id="tit-resultados" style="display:flex;flex-direction:column;gap:16px">
+        <div style="color:var(--muted);font-size:13px;padding:40px 0;text-align:center">Preencha o formulário e clique em "Gerar títulos"</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-relatorios">
+    <div class="page-header">
+      <div class="badge">Ferramentas</div>
+      <h1>Relat&oacute;rios semanais</h1>
+      <p>Gere os resumos semanais formatados para WhatsApp</p>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:24px">
+      <button id="tab-proj" onclick="switchTab('proj')" style="height:36px;padding:0 18px;border-radius:8px;font-family:var(--font-display);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:#fff">Projecoes Mensais</button>
+      <button id="tab-comp" onclick="switchTab('comp')" style="height:36px;padding:0 18px;border-radius:8px;font-family:var(--font-display);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted)">Comparativo Real</button>
+    </div>
+
+    <!-- ── Tab: Projecoes Mensais ── -->
+    <div id="tab-proj-content">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+        <div>
+          <label class="field-label">Mes atual</label>
+          <input id="p-mes-atual" class="field-input" placeholder="Junho" />
+        </div>
+        <div>
+          <label class="field-label">Dias decorridos (1 a ontem)</label>
+          <input id="p-dias-dec" class="field-input" type="number" placeholder="14" />
+        </div>
+        <div>
+          <label class="field-label">Total de dias no mes</label>
+          <input id="p-dias-total" class="field-input" type="number" placeholder="30" />
+        </div>
+        <div>
+          <label class="field-label">Mes anterior</label>
+          <input id="p-mes-ant" class="field-input" placeholder="Maio" />
+        </div>
+        <div>
+          <label class="field-label">Meta minima liquida (R$)</label>
+          <input id="p-meta" class="field-input" type="text" placeholder="1.720.000,00" />
+        </div>
+        <div>
+          <label class="field-label">Mes da meta</label>
+          <input id="p-meta-mes" class="field-input" placeholder="Junho/2026" />
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-bottom:20px">
+        <table>
+          <thead><tr>
+            <th>Canal</th>
+            <th>Fat. atual (periodo)</th>
+            <th>Fat. mes anterior (total)</th>
+          </tr></thead>
+          <tbody id="proj-tbody"></tbody>
+        </table>
+      </div>
+
+      <button class="btn btn-primary" onclick="gerarProjecoes()" style="height:38px;padding:0 24px">Gerar resumo</button>
+
+      <div id="proj-output" style="display:none;margin-top:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted)">Texto para WhatsApp</p>
+          <button onclick="copiarTexto('proj-texto')" style="font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:var(--font-display)">Copiar</button>
+        </div>
+        <pre id="proj-texto" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;font-family:var(--font-mono);font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word"></pre>
+      </div>
+    </div>
+
+    <!-- ── Tab: Comparativo Real ── -->
+    <div id="tab-comp-content" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+        <div>
+          <label class="field-label">Periodo 1 — inicio</label>
+          <input id="c-p1-inicio" class="field-input" placeholder="01/05" />
+        </div>
+        <div>
+          <label class="field-label">Periodo 1 — fim</label>
+          <input id="c-p1-fim" class="field-input" placeholder="14/05" />
+        </div>
+        <div>
+          <label class="field-label">Periodo 2 — inicio</label>
+          <input id="c-p2-inicio" class="field-input" placeholder="01/06" />
+        </div>
+        <div>
+          <label class="field-label">Periodo 2 — fim</label>
+          <input id="c-p2-fim" class="field-input" placeholder="14/06" />
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-bottom:20px">
+        <table>
+          <thead><tr>
+            <th>Canal</th>
+            <th>Fat. P1</th>
+            <th>Inv. P1</th>
+            <th>Fat. P2</th>
+            <th>Inv. P2</th>
+          </tr></thead>
+          <tbody id="comp-tbody"></tbody>
+        </table>
+      </div>
+
+      <button class="btn btn-primary" onclick="gerarComparativo()" style="height:38px;padding:0 24px">Gerar comparativo</button>
+
+      <div id="comp-output" style="display:none;margin-top:20px">
+        <!-- Tabela visual -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted)">Comparativo visual</p>
+          <button onclick="exportarComparativoPDF()" style="font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:var(--font-display)">Exportar PDF</button>
+        </div>
+        <div class="table-wrap" style="margin-bottom:20px;overflow-x:auto">
+          <table id="comp-table-visual">
+            <thead><tr id="comp-table-header"></tr></thead>
+            <tbody id="comp-table-body"></tbody>
+          </table>
+        </div>
+
+        <!-- WhatsApp -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted)">Texto para WhatsApp</p>
+          <button onclick="copiarTexto('comp-texto')" style="font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:var(--font-display)">Copiar</button>
+        </div>
+        <pre id="comp-texto" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;font-family:var(--font-mono);font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word"></pre>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Modal: editar usuario -->
+<div id="edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:100;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:360px;margin:1rem">
+    <p style="font-size:15px;font-weight:600;margin-bottom:20px">Editar colaborador</p>
+    <input type="hidden" id="edit-old-username">
+    <div style="margin-bottom:14px">
+      <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Nome</label>
+      <input type="text" id="edit-name" style="width:100%;height:44px;border:1px solid var(--border);border-radius:10px;background:var(--bg);font-family:var(--font-display);font-size:14px;color:var(--text);padding:0 14px;outline:none">
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Login</label>
+      <input type="text" id="edit-username" style="width:100%;height:44px;border:1px solid var(--border);border-radius:10px;background:var(--bg);font-family:var(--font-mono);font-size:14px;color:var(--text);padding:0 14px;outline:none">
+    </div>
+    <div id="edit-msg" style="display:none;font-size:12px;color:var(--danger);margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" style="flex:1" onclick="closeEditModal()">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="submitEdit()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: alterar senha -->
+<div id="pw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:100;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:360px;margin:1rem">
+    <p style="font-size:15px;font-weight:600;margin-bottom:20px">Alterar senha</p>
+    <input type="hidden" id="modal-username">
+    <div style="margin-bottom:14px">
+      <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">Nova senha</label>
+      <div style="position:relative">
+        <input type="password" id="modal-pw" placeholder="••••••••" style="width:100%;height:44px;border:1px solid var(--border);border-radius:10px;background:var(--bg);font-family:var(--font-display);font-size:14px;color:var(--text);padding:0 44px 0 14px;outline:none" onkeydown="if(event.key==='Enter')submitPassword()">
+        <button type="button" onclick="toggleModalPw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);display:flex;align-items:center">
+          <svg id="modal-eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="modal-msg" style="display:none;font-size:12px;color:var(--danger);margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="submitPassword()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function editUser(username, name) {
+  document.getElementById('edit-old-username').value = username;
+  document.getElementById('edit-username').value = username;
+  document.getElementById('edit-name').value = name;
+  document.getElementById('edit-msg').style.display = 'none';
+  document.getElementById('edit-modal').style.display = 'flex';
+  document.getElementById('edit-name').focus();
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').style.display = 'none';
+}
+
+async function submitEdit() {
+  const old_username = document.getElementById('edit-old-username').value;
+  const new_username = document.getElementById('edit-username').value.trim();
+  const new_name = document.getElementById('edit-name').value.trim();
+  const msg = document.getElementById('edit-msg');
+  if (!new_username || !new_name) {
+    msg.textContent = 'Preencha todos os campos.';
+    msg.style.display = 'block';
+    return;
+  }
+  const resp = await fetch(`/api/users/${old_username}/rename`, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({new_username, new_name})
+  });
+  const data = await resp.json();
+  if (data.ok) {
+    closeEditModal();
+    loadUsers();
+  } else {
+    msg.textContent = data.error;
+    msg.style.display = 'block';
+  }
+}
+
+function toggleModalPw() {
+  const input = document.getElementById('modal-pw');
+  const icon = document.getElementById('modal-eye');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/>';
+  } else {
+    input.type = 'password';
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+</script>
+
+<script>
+// ── Navigation ──
+function showScreen(name, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'usuarios') loadUsers();
+  if (name === 'importar') loadClipsCount();
+  if (name === 'relatorios') initRelatorios();
+}
+
+// ── Users ──
+async function loadUsers() {
+  const resp = await fetch('/api/users');
+  const users = await resp.json();
+  const tbody = document.getElementById('users-tbody');
+  tbody.innerHTML = '';
+  users.forEach(u => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-weight:500">${u.name}</td>
+      <td><span class="mono">${u.username}</span></td>
+      <td><span class="channel-tag ${u.role === 'master' ? 'ch-goquadros' : 'ch-freewall'}">${u.role}</span></td>
+      <td style="text-align:right">
+        ${u.role !== 'master' ? `
+        <button onclick="editUser('${u.username}','${u.name}')" style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;margin-right:8px">Editar</button>
+        <button onclick="changePassword('${u.username}')" style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;margin-right:8px">Senha</button>
+        <button onclick="deleteUser('${u.username}')" style="font-size:11px;color:var(--danger);background:none;border:none;cursor:pointer">Remover</button>
+        ` : ''}
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+async function addUser() {
+  const name = document.getElementById('new-name').value.trim();
+  const username = document.getElementById('new-username').value.trim();
+  const password = document.getElementById('new-password').value;
+  const msg = document.getElementById('users-msg');
+  const resp = await fetch('/api/users', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({name, username, password})
+  });
+  const data = await resp.json();
+  msg.style.display = 'block';
+  if (data.ok) {
+    msg.style.color = 'var(--accent)';
+    msg.textContent = 'Colaborador adicionado com sucesso.';
+    document.getElementById('new-name').value = '';
+    document.getElementById('new-username').value = '';
+    document.getElementById('new-password').value = '';
+    loadUsers();
+  } else {
+    msg.style.color = 'var(--danger)';
+    msg.textContent = data.error;
+  }
+}
+
+async function deleteUser(username) {
+  if (!confirm(`Remover o usuario "${username}"?`)) return;
+  await fetch(`/api/users/${username}`, {method: 'DELETE'});
+  loadUsers();
+}
+
+function changePassword(username) {
+  document.getElementById('modal-username').value = username;
+  document.getElementById('modal-pw').value = '';
+  document.getElementById('modal-msg').style.display = 'none';
+  document.getElementById('pw-modal').style.display = 'flex';
+  document.getElementById('modal-pw').focus();
+}
+
+function closeModal() {
+  document.getElementById('pw-modal').style.display = 'none';
+}
+
+async function submitPassword() {
+  const username = document.getElementById('modal-username').value;
+  const pw = document.getElementById('modal-pw').value;
+  const msg = document.getElementById('modal-msg');
+  if (!pw) { msg.textContent = 'Digite uma senha.'; msg.style.display = 'block'; return; }
+  const resp = await fetch(`/api/users/${username}/password`, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({password: pw})
+  });
+  const data = await resp.json();
+  if (data.ok) {
+    closeModal();
+    loadUsers();
+  } else {
+    msg.textContent = data.error;
+    msg.style.display = 'block';
+  }
+}
+
+// ── Orders ──
+let allOrders = [];
+
+async function importarLista() {
+  const raw = document.getElementById('import-ids').value;
+  const ids = raw.split(/[\n,;\s]+/).map(s => s.trim()).filter(s => /^MLB\d{7,20}$/i.test(s));
+  if (ids.length === 0) { alert('Nenhum ID valido encontrado. Os IDs devem comecar com MLB seguido de numeros.'); return; }
+  const msg = document.getElementById('import-msg');
+  msg.style.display = 'inline';
+  msg.style.color = 'var(--muted)';
+  msg.textContent = `Importando ${ids.length} IDs...`;
+  const resp = await fetch('/api/clips/bulk', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ids}) });
+  const data = await resp.json();
+  msg.style.color = 'var(--accent)';
+  msg.textContent = `${data.added} adicionados, ${data.total} no total.`;
+  document.getElementById('clips-count').textContent = data.total;
+  document.getElementById('import-ids').value = '';
+}
+
+async function marcarTemClipBulk() {
+  const raw = document.getElementById('remove-ids').value;
+  const ids = raw.split(/[\n,;\s]+/).map(s => s.trim()).filter(s => /^MLB\d{7,20}$/i.test(s));
+  if (ids.length === 0) { alert('Nenhum ID válido encontrado. Os IDs devem começar com MLB seguido de números.'); return; }
+  const msg = document.getElementById('remove-msg');
+  msg.style.display = 'inline';
+  msg.style.color = 'var(--muted)';
+  msg.textContent = `Processando ${ids.length} IDs...`;
+  const resp = await fetch('/api/clips/bulk-remove', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ids})
+  });
+  const data = await resp.json();
+  msg.style.color = 'var(--accent)';
+  msg.textContent = `${data.removed} removidos. ${data.total} ainda sem clip na whitelist.`;
+  document.getElementById('remove-ids').value = '';
+  document.getElementById('clips-count').textContent = data.total;
+}
+
+async function loadClipsCount() {
+  const resp = await fetch('/api/clips');
+  const data = await resp.json();
+  document.getElementById('clips-count').textContent = data.length;
+}
+
+async function markClip(itemId, btn) {
+  if (!confirm(`Marcar o anuncio ${itemId} como "ja tem clip"? Ele vai sumir da lista.`)) return;
+  btn.disabled = true;
+  btn.textContent = '...';
+  await fetch(`/api/clips/${itemId}`, { method: 'DELETE' });
+  allOrders = allOrders.filter(o => o.item_id !== itemId);
+  applyFilters();
+}
+
+function channelClass(name) {
+  if (name.toLowerCase().includes('freewall')) return 'ch-freewall';
+  return 'ch-goquadros';
+}
+
+function formatDate(d) {
+  const part = (d || '').split('T')[0];
+  return part.split('-').reverse().join('/');
+}
+
+function isoDate(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+function calcDataEnvio(dateStr) {
+  if (!dateStr || dateStr === '—') return null;
+  const datePart = dateStr.split('T')[0];
+  let hora = 0;
+  if (dateStr.includes('T')) {
+    hora = parseInt(dateStr.split('T')[1].substring(0, 2), 10);
+  }
+  const [year, month, day] = datePart.split('-').map(Number);
+  const d = new Date(year, month - 1, day);
+  if (hora >= 11) d.setDate(d.getDate() + 1);
+  const dow = d.getDay();
+  if (dow === 6) d.setDate(d.getDate() + 2);
+  else if (dow === 0) d.setDate(d.getDate() + 1);
+  return isoDate(d);
+}
+
+let periodoAtivo = 'proximos';
+
+function setPeriodo(p) {
+  periodoAtivo = p;
+  document.getElementById('btn-hoje').className = p === 'hoje' ? 'btn btn-primary' : 'btn btn-ghost';
+  document.getElementById('btn-proximos').className = p === 'proximos' ? 'btn btn-primary' : 'btn btn-ghost';
+  applyFilters();
+}
+
+function renderTable(orders) {
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  if (orders.length === 0) {
+    document.getElementById('table').style.display = 'none';
+    document.getElementById('empty').style.display = 'block';
+    return;
+  }
+  document.getElementById('table').style.display = 'table';
+  document.getElementById('empty').style.display = 'none';
+
+  orders.forEach(o => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="product-cell">
+          ${o.thumbnail ? `<img src="${o.thumbnail}" alt="">` : '<div class="img-placeholder"></div>'}
+          <div>
+            <div class="product-title">${o.title}</div>
+            <span class="no-clip-tag">Sem clip</span>
+          </div>
+        </div>
+      </td>
+      <td>${(o.order_ids || [String(o.order_id)]).map(id => `<span class="mono" style="display:block">#${id}</span>`).join('')}</td>
+      <td><span class="mono">${o.item_id}</span></td>
+      <td><span class="mono">${o.sku}</span></td>
+      <td>
+        <div class="attr-list">
+          <div class="attr-row"><span class="attr-key">TAM</span> ${o.tamanho}</div>
+          <div class="attr-row"><span class="attr-key">MOL</span> ${o.moldura}</div>
+          <div class="attr-row"><span class="attr-key">COR</span> ${o.cor_moldura}</div>
+          <div class="attr-row"><span class="attr-key">ACA</span> ${o.acabamento}</div>
+        </div>
+      </td>
+      <td><span class="channel-tag ${channelClass(o.channel)}">${o.channel}</span></td>
+      <td><span class="mono">${formatDate(o.ship_by || calcDataEnvio(o.date) || o.date)}</span></td>
+      <td style="text-align:center">
+        <span style="font-family:var(--font-mono)">${o.quantity}</span>
+        ${o.order_ids && o.order_ids.length > 1 ? `<div style="font-size:10px;color:var(--muted);margin-top:2px">${o.order_ids.length} pedidos</div>` : ''}
+      </td>
+      <td style="text-align:center">
+        <button onclick="markClip('${o.item_id}', this)" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px;font-family:var(--font-display);color:var(--muted);cursor:pointer;white-space:nowrap" title="Marcar este anuncio como ja tem clip">
+          Tem clip
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function applyFilters() {
+  const search = document.getElementById('search').value.toLowerCase();
+  const account = document.getElementById('filter-account').value;
+  const filtered = allOrders.filter(o => {
+    const matchSearch = !search ||
+      o.title.toLowerCase().includes(search) ||
+      o.sku.toLowerCase().includes(search) ||
+      String(o.item_id).includes(search) ||
+      String(o.order_id).includes(search);
+    const matchAccount = !account || o.channel === account;
+    const shipDate = o.ship_by || calcDataEnvio(o.date);
+    const hoje = isoDate(new Date());
+    const matchData = periodoAtivo === 'hoje'
+      ? shipDate === hoje
+      : (shipDate && shipDate > hoje);
+    return matchSearch && matchAccount && matchData;
+  });
+
+  document.getElementById('stat-total').textContent = filtered.length;
+  document.getElementById('stat-fw').textContent = filtered.filter(o => o.channel.toLowerCase().includes('freewall')).length;
+  document.getElementById('stat-gq').textContent = filtered.filter(o => o.channel.toLowerCase().includes('gq decoração')).length;
+  renderTable(filtered);
+}
+
+async function loadOrders() {
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('table').style.display = 'none';
+  document.getElementById('empty').style.display = 'none';
+
+  const now = new Date();
+  const dateFrom = new Date(now);
+  dateFrom.setDate(dateFrom.getDate() - 30);
+  const params = new URLSearchParams({
+    date_from: dateFrom.toISOString(),
+    date_to: now.toISOString(),
+  });
+  const resp = await fetch(`/api/orders?${params}`);
+  allOrders = await resp.json();
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('last-update').textContent = 'Atualizado ' + new Date().toLocaleTimeString('pt-BR');
+  applyFilters();
+}
+
+document.getElementById('search').addEventListener('input', applyFilters);
+document.getElementById('filter-account').addEventListener('change', applyFilters);
+
+loadOrders();
+
+// ── Relatorios ──
+const CANAIS = [
+  { id: 'shopee1', label: 'Shopee 1 GQ' },
+  { id: 'shopee2', label: 'Shopee 2 Freewall' },
+  { id: 'ml1',    label: 'ML1 Freewall' },
+  { id: 'ml2',    label: 'ML2 GQ' },
+  { id: 'tiktok', label: 'TikTok Shop' },
+];
+
+function parseBRL(v) {
+  if (!v) return 0;
+  v = String(v).trim();
+  if (v === '') return 0;
+  // Formato BR: ponto = milhar, virgula = decimal
+  v = v.replace(/\./g, '').replace(',', '.');
+  const n = Number(v);
+  return isNaN(n) ? 0 : n;
+}
+function fmtBRL(v) {
+  return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtPct(v) {
+  const abs = Math.abs(v);
+  let s;
+  if (abs > 0 && abs < 1) {
+    s = abs.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  } else {
+    s = Math.round(abs).toLocaleString('pt-BR');
+  }
+  return (v >= 0 ? '+' : '-') + s + '%';
+}
+
+function initRelatorios() {
+  const hoje = new Date();
+  const ontem = new Date(hoje); ontem.setDate(hoje.getDate() - 1);
+  const dd = d => String(d.getDate()).padStart(2, '0');
+  const mm = d => String(d.getMonth() + 1).padStart(2, '0');
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const mesAtualNome = meses[hoje.getMonth()];
+  const mesAntNome = meses[(hoje.getMonth() + 11) % 12];
+  const diasDecorridos = ontem.getDate();
+  const diasTotal = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
+  const mesAnt = (hoje.getMonth() + 11) % 12;
+  const anoAnt = mesAnt === 11 ? hoje.getFullYear() - 1 : hoje.getFullYear();
+  const diasAnt = new Date(anoAnt, mesAnt + 1, 0).getDate();
+
+  // Preenche campos de projecoes
+  document.getElementById('p-mes-atual').value = mesAtualNome;
+  document.getElementById('p-dias-dec').value = diasDecorridos;
+  document.getElementById('p-dias-total').value = diasTotal;
+  document.getElementById('p-mes-ant').value = mesAntNome;
+  document.getElementById('p-meta-mes').value = mesAtualNome + '/' + hoje.getFullYear();
+
+  // Preenche campos de comparativo
+  document.getElementById('c-p1-inicio').value = '01/' + String(mesAnt + 1).padStart(2,'0');
+  document.getElementById('c-p1-fim').value = dd(ontem) + '/' + String(mesAnt + 1).padStart(2,'0');
+  document.getElementById('c-p2-inicio').value = '01/' + mm(hoje);
+  document.getElementById('c-p2-fim').value = dd(ontem) + '/' + mm(hoje);
+
+  // Monta linhas da tabela de projecoes
+  const projTbody = document.getElementById('proj-tbody');
+  projTbody.innerHTML = CANAIS.map(c => `
+    <tr>
+      <td style="font-weight:500">${c.label}</td>
+      <td><input class="field-input" id="proj-fat-${c.id}" type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
+      <td><input class="field-input" id="proj-ant-${c.id}" type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
+    </tr>`).join('');
+
+  // Monta linhas da tabela de comparativo
+  const compTbody = document.getElementById('comp-tbody');
+  compTbody.innerHTML = CANAIS.map(c => `
+    <tr>
+      <td style="font-weight:500">${c.label}</td>
+      <td><input class="field-input" id="comp-f1-${c.id}" type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
+      <td><input class="field-input" id="comp-i1-${c.id}" type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
+      <td><input class="field-input" id="comp-f2-${c.id}" type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
+      <td><input class="field-input" id="comp-i2-${c.id}" type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
+    </tr>`).join('');
+}
+
+function switchTab(tab) {
+  document.getElementById('tab-proj-content').style.display = tab === 'proj' ? '' : 'none';
+  document.getElementById('tab-comp-content').style.display = tab === 'comp' ? '' : 'none';
+  document.getElementById('tab-proj').style.background = tab === 'proj' ? 'var(--accent)' : 'var(--surface)';
+  document.getElementById('tab-proj').style.color = tab === 'proj' ? '#fff' : 'var(--muted)';
+  document.getElementById('tab-proj').style.borderColor = tab === 'proj' ? 'var(--accent)' : 'var(--border)';
+  document.getElementById('tab-comp').style.background = tab === 'comp' ? 'var(--accent)' : 'var(--surface)';
+  document.getElementById('tab-comp').style.color = tab === 'comp' ? '#fff' : 'var(--muted)';
+  document.getElementById('tab-comp').style.borderColor = tab === 'comp' ? 'var(--accent)' : 'var(--border)';
+}
+
+function gerarProjecoes() {
+  const mesAtual = document.getElementById('p-mes-atual').value.trim();
+  const diasDec = Number(document.getElementById('p-dias-dec').value) || 1;
+  const diasTotal = Number(document.getElementById('p-dias-total').value) || 30;
+  const mesAnt = document.getElementById('p-mes-ant').value.trim();
+  const meta = parseBRL(document.getElementById('p-meta').value);
+  const metaMes = document.getElementById('p-meta-mes').value.trim();
+
+  const hoje = new Date();
+  const mm = d => String(d.getMonth() + 1).padStart(2,'0');
+  const periodoLabel = `01/${mm(hoje)} a ${String(diasDec).padStart(2,'0')}/${mm(hoje)}`;
+
+  let totalProj = 0;
+  let linhasCanais = '';
+
+  CANAIS.forEach(c => {
+    const fat = parseBRL(document.getElementById(`proj-fat-${c.id}`).value);
+    const ant = parseBRL(document.getElementById(`proj-ant-${c.id}`).value);
+    const proj = fat / diasDec * diasTotal;
+    const pct = ant > 0 ? (proj - ant) / ant * 100 : 0;
+    totalProj += proj;
+    linhasCanais += `• *${c.label}* - ${fmtBRL(proj)} (${fmtPct(pct)})\n`;
+  });
+
+  const diff = totalProj - meta;
+  const crescPct = meta > 0 ? (diff / meta * 100) : 0;
+  const diffSinal = diff >= 0 ? '+' : '-';
+
+  const texto = `*📊 Projeções Mensais*\n\n*📅 ${mesAtual} (${periodoLabel})*\n\n*🔀 Canais*\n${linhasCanais}\n*💵 Faturamento Total Bruto (projeção)*\n${fmtBRL(totalProj)}\n\n*🎯 Meta Mínima Líquida — ${metaMes}*\n${fmtBRL(meta)}\n\n*${diff >= 0 ? '📈' : '📉'} Resultado vs Meta*\n• Crescimento: ${fmtPct(crescPct)}\n• Diferença: ${diffSinal}${fmtBRL(Math.abs(diff))}`;
+
+  document.getElementById('proj-texto').textContent = texto;
+  document.getElementById('proj-output').style.display = '';
+}
+
+function gerarComparativo() {
+  const p1i = document.getElementById('c-p1-inicio').value.trim();
+  const p1f = document.getElementById('c-p1-fim').value.trim();
+  const p2i = document.getElementById('c-p2-inicio').value.trim();
+  const p2f = document.getElementById('c-p2-fim').value.trim();
+
+  let totalF1 = 0, totalI1 = 0, totalF2 = 0, totalI2 = 0;
+
+  // Tabela visual
+  const header = document.getElementById('comp-table-header');
+  const tbody = document.getElementById('comp-table-body');
+  header.innerHTML = `<th>Canal</th><th>${p1i} a ${p1f}</th><th></th><th>${p2i} a ${p2f}</th><th>Var. Fat.</th>`;
+  tbody.innerHTML = '';
+
+  let wppP1 = '', wppP2 = '';
+
+  CANAIS.forEach(c => {
+    const f1 = parseBRL(document.getElementById(`comp-f1-${c.id}`).value);
+    const i1 = parseBRL(document.getElementById(`comp-i1-${c.id}`).value);
+    const f2 = parseBRL(document.getElementById(`comp-f2-${c.id}`).value);
+    const i2 = parseBRL(document.getElementById(`comp-i2-${c.id}`).value);
+
+    const acos1 = f1 > 0 ? (i1 / f1 * 100) : 0;
+    const roas1 = i1 > 0 ? (f1 / i1) : 0;
+    const acos2 = f2 > 0 ? (i2 / f2 * 100) : 0;
+    const roas2 = i2 > 0 ? (f2 / i2) : 0;
+    const varFat = f1 > 0 ? (f2 - f1) / f1 * 100 : 0;
+
+    totalF1 += f1; totalI1 += i1; totalF2 += f2; totalI2 += i2;
+
+    const deltaClass = varFat >= 0 ? 'comp-delta-pos' : 'comp-delta-neg';
+    tbody.innerHTML += `<tr>
+      <td style="font-weight:500">${c.label}</td>
+      <td style="font-size:12px">${fmtBRL(f1)}<br><span style="color:var(--muted);font-size:11px">ACOS ${acos1.toFixed(2)}% | ROAS ${roas1.toFixed(2)}x</span></td>
+      <td style="color:var(--border);font-size:18px;text-align:center">→</td>
+      <td style="font-size:12px">${fmtBRL(f2)}<br><span style="color:var(--muted);font-size:11px">ACOS ${acos2.toFixed(2)}% | ROAS ${roas2.toFixed(2)}x</span></td>
+      <td class="${deltaClass}">${fmtPct(varFat)}</td>
+    </tr>`;
+
+    wppP1 += `\n🛒 *${c.label}*\n* Faturamento: ${fmtBRL(f1)}\n* Investimento: ${fmtBRL(i1)}\n* ACOS: ${acos1.toFixed(2)}% | ROAS: ${roas1.toFixed(2)}x\n`;
+    wppP2 += `\n🛒 *${c.label}*\n* Faturamento: ${fmtBRL(f2)}\n* Investimento: ${fmtBRL(i2)}\n* ACOS: ${acos2.toFixed(2)}% | ROAS: ${roas2.toFixed(2)}x\n`;
+  });
+
+  // Linha de totais
+  const acosT1 = totalF1 > 0 ? (totalI1/totalF1*100) : 0;
+  const roasT1 = totalI1 > 0 ? (totalF1/totalI1) : 0;
+  const acosT2 = totalF2 > 0 ? (totalI2/totalF2*100) : 0;
+  const roasT2 = totalI2 > 0 ? (totalF2/totalI2) : 0;
+  const varTot = totalF1 > 0 ? (totalF2-totalF1)/totalF1*100 : 0;
+  const deltaClass = varTot >= 0 ? 'comp-delta-pos' : 'comp-delta-neg';
+  tbody.innerHTML += `<tr style="background:var(--surface2);font-weight:600">
+    <td>TOTAL</td>
+    <td style="font-size:12px">${fmtBRL(totalF1)}<br><span style="font-weight:400;color:var(--muted);font-size:11px">ACOS ${acosT1.toFixed(2)}% | ROAS ${roasT1.toFixed(2)}x</span></td>
+    <td style="color:var(--border);font-size:18px;text-align:center">→</td>
+    <td style="font-size:12px">${fmtBRL(totalF2)}<br><span style="font-weight:400;color:var(--muted);font-size:11px">ACOS ${acosT2.toFixed(2)}% | ROAS ${roasT2.toFixed(2)}x</span></td>
+    <td class="${deltaClass}">${fmtPct(varTot)}</td>
+  </tr>`;
+
+  const wpp = `📊 *Comparativo Real x Mês Anterior*\n\n📅 *Período 1 - ${p1i} a ${p1f}*\n${wppP1}\n━━━━━━━━━━━━━━━\n\n📅 *Período 2 - ${p2i} a ${p2f}*\n${wppP2}`;
+  document.getElementById('comp-texto').textContent = wpp;
+  document.getElementById('comp-output').style.display = '';
+}
+
+function copiarTexto(id) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent);
+}
+
+function exportarComparativoPDF() {
+  const tabela = document.getElementById('comp-table-visual').outerHTML;
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  const win = window.open('', '_blank');
+  win.document.write(`
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Comparativo Real - ${hoje}</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 24px; color: #1A1916; }
+        h1 { font-size: 18px; margin-bottom: 4px; }
+        p.sub { font-size: 12px; color: #7A7770; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px 12px; text-align: left; font-size: 12px; border-bottom: 1px solid #D8D4CA; }
+        thead th { background: #EFEDE7; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #7A7770; }
+        tr:last-child td { font-weight: 600; background: #EFEDE7; }
+        span { color: #7A7770; font-size: 10px; display:block; }
+      </style>
+    </head>
+    <body>
+      <h1>Comparativo Real x Mes Anterior</h1>
+      <p class="sub">Go Quadros — Marketplaces — Exportado em ${hoje}</p>
+      ${tabela}
+      <scr` + `ipt>
+        window.onload = () => { window.print(); };
+      </scr` + `ipt>
+    </body>
+    </html>
+  `);
+  win.document.close();
+}
+
+// ── Calculator ──
+var CUSTOS = {
+  sem: {
+    avulso: { '30x45': 16.67, '40x60': 22.67, '50x70': 29.35, '60x90': 40.90 },
+    dupla:  { '30x45': 30.19, '40x60': 40.77, '50x70': 52.27, '60x90': 72.21 },
+    trio:   { '30x45': 38.93, '40x60': 59.89, '50x70': 76.35, '60x90': 104.86 }
+  },
+  com: {
+    avulso: { '30x45': 22.46, '40x60': 33.30, '50x70': 44.65, '60x90': 63.75 },
+    dupla:  { '30x45': 44.89, '40x60': 58.05, '50x70': 82.11, '60x90': 111.09 },
+    trio:   { '30x45': 57.81, '40x60': 90.90, '50x70': 121.11, '60x90': 172.88 }
+  }
+};
+
+var cmode = 'pct';
+var cmvAtual = null;
+
+function fmt(v) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmtPct(v) { return v.toFixed(1).replace('.', ',') + '%'; }
+
+function updateCmv() {
+  var vidro = document.getElementById('vidro').value;
+  var qtd = document.getElementById('qtd').value;
+  var tamanho = document.getElementById('ctamanho').value;
+  var valEl = document.getElementById('cmv-value');
+  var labelEl = document.getElementById('cmv-label');
+  if (vidro && qtd && tamanho) {
+    cmvAtual = CUSTOS[vidro][qtd][tamanho];
+    valEl.textContent = fmt(cmvAtual);
+    valEl.className = 'cmv-value';
+    labelEl.textContent = 'Preenchido automaticamente';
+  } else {
+    cmvAtual = null;
+    valEl.textContent = '—';
+    valEl.className = 'cmv-value empty';
+    labelEl.textContent = 'Selecione as especificacoes acima';
+  }
+  calc();
+}
+
+function setMode(m) {
+  cmode = m;
+  document.getElementById('btn-pct').className = m === 'pct' ? 'active' : '';
+  document.getElementById('btn-rs').className = m === 'rs' ? 'active' : '';
+  var suffix = document.getElementById('comissao-suffix');
+  var prefix = document.getElementById('comissao-prefix');
+  var input = document.getElementById('comissao');
+  if (m === 'pct') {
+    suffix.style.display = ''; prefix.style.display = 'none';
+    input.style.paddingLeft = '12px'; input.placeholder = '0';
+  } else {
+    suffix.style.display = 'none'; prefix.style.display = '';
+    input.style.paddingLeft = '36px'; input.placeholder = '0,00';
+  }
+  input.value = '';
+  calc();
+}
+
+function calc() {
+  var venda = parseFloat(document.getElementById('venda').value) || 0;
+  var comissaoInput = parseFloat(document.getElementById('comissao').value) || 0;
+  var frete = parseFloat(document.getElementById('frete').value) || 0;
+  var cmv = cmvAtual || 0;
+
+  if (venda <= 0) {
+    document.getElementById('calc-empty').style.display = 'block';
+    document.getElementById('result-content').style.display = 'none';
+    return;
+  }
+
+  var comissaoVal = cmode === 'pct' ? venda * (comissaoInput / 100) : comissaoInput;
+  var totalCustos = cmv + frete + comissaoVal;
+  var margem = venda - totalCustos;
+  var margemPct = (margem / venda) * 100;
+  var isPositive = margem >= 0;
+
+  document.getElementById('result-grid').innerHTML =
+    '<div class="metric"><p class="metric-label">Comissao</p><p class="metric-value">' + fmt(comissaoVal) + '</p></div>' +
+    '<div class="metric"><p class="metric-label">Total de custos</p><p class="metric-value">' + fmt(totalCustos) + '</p></div>' +
+    '<div class="metric ' + (isPositive ? 'highlight' : 'danger-bg') + '">' +
+      '<p class="metric-label">Margem de contribuicao</p>' +
+      '<p class="metric-value">' + fmt(margem) + '</p>' +
+      '<p class="metric-sub">' + fmtPct(margemPct) + ' do preco de venda</p>' +
+    '</div>';
+
+  var bars = [
+    { name: 'CMV + embalagem', val: cmv, color: '#2C6B4F' },
+    { name: 'Frete', val: frete, color: '#1A5F7A' },
+    { name: 'Comissao', val: comissaoVal, color: '#7A5000' },
+    { name: 'Margem', val: margem, color: isPositive ? '#2C6B4F' : '#9B2C2C' }
+  ];
+
+  var barsHtml = '';
+  bars.forEach(function(b) {
+    var pct = (b.val / venda) * 100;
+    var width = Math.max(0, Math.min(100, pct));
+    barsHtml +=
+      '<div class="bar-row">' +
+        '<span class="bar-name">' + b.name + '</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + width + '%;background:' + b.color + '"></div></div>' +
+        '<span class="bar-pct" style="color:' + b.color + '">' + fmtPct(pct) + '</span>' +
+      '</div>';
+  });
+  document.getElementById('bars').innerHTML = barsHtml;
+
+  document.getElementById('calc-empty').style.display = 'none';
+  document.getElementById('result-content').style.display = 'block';
+}
+
+// ── Medidas e Peso – busca individual ───────────────────────────────────────
+function getMedidasAccount() {
+  return document.getElementById('medidas-account').value || Object.keys({{accounts|tojson}})[0];
+}
+
+function loadSingleItem() {
+  const id = document.getElementById('single-item-id').value.trim().toUpperCase();
+  if (!id) return;
+  const account = getMedidasAccount();
+  if (!account) { alert('Selecione uma conta primeiro.'); return; }
+  document.getElementById('single-status').textContent = 'Buscando...';
+  document.getElementById('single-item-result').style.display = 'none';
+  fetch(`/api/items/${account}/single/${id}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) { document.getElementById('single-status').textContent = data.error; return; }
+      document.getElementById('single-thumb').src = data.thumbnail || '';
+      document.getElementById('single-title').textContent = data.title;
+      document.getElementById('single-dims').textContent = 'Atual: ' + (data.dimensions || '—');
+      document.getElementById('single-new-dims').value = data.dimensions || '';
+      document.getElementById('single-item-result').style.display = 'flex';
+      document.getElementById('single-status').textContent = '';
+    })
+    .catch(() => { document.getElementById('single-status').textContent = 'Erro ao buscar'; });
+}
+
+function saveSingleItem() {
+  const id = document.getElementById('single-item-id').value.trim().toUpperCase();
+  const dims = document.getElementById('single-new-dims').value.trim();
+  const account = getMedidasAccount();
+  if (!id || !dims || !account) return;
+  document.getElementById('single-status').textContent = 'Salvando...';
+  fetch(`/api/items/${account}/update`, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify([{item_id: id, dimensions: dims}])
+  })
+    .then(r => r.json())
+    .then(results => {
+      const r = results[0] || {};
+      if (r.ok) {
+        document.getElementById('single-dims').textContent = 'Atual: ' + dims;
+        document.getElementById('single-status').textContent = '✓ Salvo com sucesso';
+      } else {
+        document.getElementById('single-status').textContent = `Erro (status ${r.status})`;
+      }
+    })
+    .catch(() => { document.getElementById('single-status').textContent = 'Erro ao salvar'; });
+}
+
+// ── Medidas e Peso ──────────────────────────────────────────────────────────
+let medidaItems = [];
+let medidaEdits = {};
+
+function loadMedidas() {
+  const account = document.getElementById('medidas-account').value;
+  if (!account) return;
+  const btn = document.getElementById('btn-importar-anuncios');
+  btn.textContent = 'Importando...';
+  btn.disabled = true;
+  document.getElementById('medidas-status').textContent = '';
+  document.getElementById('medidas-table-wrap').style.display = 'none';
+  fetch(`/api/items/${account}`)
+    .then(r => r.json())
+    .then(data => {
+      medidaItems = data.items || [];
+      medidaEdits = {};
+      renderMedidasTable();
+      document.getElementById('medidas-table-wrap').style.display = 'block';
+      document.getElementById('medidas-status').textContent = `${medidaItems.length} anúncios carregados`;
+    })
+    .catch(() => { document.getElementById('medidas-status').textContent = 'Erro ao carregar'; })
+    .finally(() => { btn.textContent = 'Importar anúncios'; btn.disabled = false; });
+}
+
+function renderMedidasTable() {
+  const q = (document.getElementById('medidas-search') || {value:''}).value.toLowerCase();
+  const rows = medidaItems.filter(it => !q || it.title.toLowerCase().includes(q) || it.id.toLowerCase().includes(q));
+  let html = `<table class="data-table">
+    <thead><tr>
+      <th style="width:48px"></th>
+      <th>Título</th>
+      <th style="width:120px">ID</th>
+      <th style="width:200px">Dimensões atuais</th>
+      <th style="width:220px">Novas dimensões <span style="font-weight:400;font-size:10px">(AltxLargxComp,PesoGr)</span></th>
+    </tr></thead><tbody>`;
+  rows.forEach(it => {
+    const edited = medidaEdits[it.id] !== undefined;
+    html += `<tr style="${edited ? 'background:var(--amber-subtle, rgba(251,191,36,0.07))' : ''}">
+      <td><img src="${it.thumbnail}" style="width:40px;height:40px;object-fit:cover;border-radius:4px" onerror="this.style.display='none'"></td>
+      <td style="font-size:12px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${it.title}">${it.title}</td>
+      <td><span class="mono" style="font-size:11px">${it.id}</span></td>
+      <td><span class="mono" style="font-size:11px;color:var(--muted)">${it.dimensions || '—'}</span></td>
+      <td><input type="text" value="${medidaEdits[it.id] || ''}" placeholder="${it.dimensions || 'ex: 12x50x70,3000'}"
+        oninput="medidaEdits['${it.id}'] = this.value; this.closest('tr').style.background = this.value ? 'var(--amber-subtle, rgba(251,191,36,0.07))' : ''"
+        style="width:100%;height:30px;padding:0 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-family:var(--font-mono);font-size:11px">
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('medidas-table').innerHTML = html;
+  document.getElementById('medidas-count').textContent = `${rows.length} de ${medidaItems.length}`;
+}
+
+function salvarMedidas() {
+  const account = document.getElementById('medidas-account').value;
+  const updates = Object.entries(medidaEdits)
+    .filter(([,v]) => v.trim())
+    .map(([item_id, dimensions]) => ({item_id, dimensions: dimensions.trim()}));
+  if (!updates.length) { alert('Nenhuma alteração para salvar.'); return; }
+  const btn = document.getElementById('btn-salvar-medidas');
+  btn.textContent = `Salvando ${updates.length} itens...`;
+  btn.disabled = true;
+  fetch(`/api/items/${account}/update`, {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(updates)
+  })
+    .then(r => r.json())
+    .then(results => {
+      const ok = results.filter(r => r.ok).length;
+      const fail = results.filter(r => !r.ok).length;
+      // Atualiza dimensões na lista local
+      results.filter(r => r.ok).forEach(r => {
+        const item = medidaItems.find(it => it.id === r.item_id);
+        if (item) { item.dimensions = medidaEdits[r.item_id]; delete medidaEdits[r.item_id]; }
+      });
+      renderMedidasTable();
+      document.getElementById('medidas-status').textContent =
+        `✓ ${ok} atualizados com sucesso` + (fail ? ` · ${fail} falharam` : '');
+    })
+    .catch(() => { document.getElementById('medidas-status').textContent = 'Erro ao salvar'; })
+    .finally(() => { btn.textContent = 'Salvar alterações'; btn.disabled = false; });
+}
+
+// ===== GERADOR DE TÍTULOS =====
+let titPlatform = 'ml';
+let titVidro = false;
+let titExistentes = null;
+
+function setTitPlatform(p) {
+  titPlatform = p;
+  document.getElementById('tit-plat-ml').className = 'btn ' + (p === 'ml' ? 'btn-primary' : 'btn-ghost');
+  document.getElementById('tit-plat-shp').className = 'btn ' + (p === 'shopee' ? 'btn-primary' : 'btn-ghost');
+  document.getElementById('tit-tamanho-wrap').style.display = p === 'ml' ? '' : 'none';
+  document.getElementById('tit-vidro-wrap').style.display = p === 'ml' ? '' : 'none';
+  const contaSel = document.getElementById('tit-conta');
+  if (p === 'ml') {
+    contaSel.innerHTML = '<option value="nova_gq">GQ Decoração (Filete)</option><option value="freewall">Freewall Decoração (Caixinha)</option>';
+  } else {
+    contaSel.innerHTML = '<option value="nova_gq">GQ Decoração (Caixinha)</option><option value="freewall">Freewall Decoração (Filete)</option>';
+  }
+}
+
+function setTitVidro(v) {
+  titVidro = v;
+  document.getElementById('tit-sv').className = 'btn ' + (!v ? 'btn-primary' : 'btn-ghost');
+  document.getElementById('tit-cv').className = 'btn ' + (v ? 'btn-primary' : 'btn-ghost');
+}
+
+async function gerarTitulos() {
+  const estilo = document.getElementById('tit-estilo').value.trim();
+  const nome   = document.getElementById('tit-nome').value.trim();
+  if (!estilo) { alert('Informe o estilo/categoria'); return; }
+  const payload = {
+    plataforma: titPlatform,
+    conta: document.getElementById('tit-conta').value,
+    estilo,
+    nome,
+    quantidade: document.getElementById('tit-qtd').value,
+    tamanho: document.getElementById('tit-tamanho').value,
+    vidro: titVidro,
+  };
+  const res = await fetch('/api/titulos/gerar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (data.error) { alert(data.error); return; }
+  renderTitulos(data.titulos);
+}
+
+function renderTitulos(titulos) {
+  const isML = titPlatform === 'ml';
+  const minC = isML ? 57 : 96;
+  const maxC = isML ? 60 : 99;
+  const container = document.getElementById('tit-resultados');
+  container.innerHTML = titulos.map((t, i) => {
+    const ok = t.chars >= minC && t.chars <= maxC;
+    const badgeColor = ok ? '#22c55e' : '#ef4444';
+    const dupStatus = titExistentes ? checkDup(t.title) : null;
+    const dupHtml = dupStatus
+      ? `<div style="margin-top:8px;padding:6px 10px;border-radius:6px;background:${dupStatus.dup ? '#fef2f2' : '#f0fdf4'};color:${dupStatus.dup ? '#b91c1c' : '#15803d'};font-size:11px">
+           ${dupStatus.dup ? `⚠ Semelhante a: "${dupStatus.match}" (${dupStatus.conta})` : '✓ Nenhum título parecido encontrado'}
+         </div>`
+      : (titExistentes === null ? '' : '');
+    return `<div class="card" style="padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Variação ${i+1}</span>
+        <span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:${ok ? '#dcfce7' : '#fee2e2'};color:${badgeColor}">${t.chars} chars ${ok ? '✓' : '✗ fora do limite'}</span>
+      </div>
+      <div style="font-size:15px;font-weight:500;line-height:1.5;color:var(--text);word-break:break-word">${t.title}</div>
+      ${dupHtml}
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn btn-ghost" style="height:30px;font-size:12px;flex:1" onclick="copyTit(this, '${t.title.replace(/'/g,"\\'")}')">Copiar</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  if (titExistentes === null) {
+    container.innerHTML += `<div style="text-align:center;padding:8px 0">
+      <button class="btn btn-ghost" style="height:32px;font-size:12px" onclick="carregarExistentes(true)">Verificar duplicatas</button>
+    </div>`;
+  }
+}
+
+function checkDup(title) {
+  if (!titExistentes || titExistentes.length === 0) return { dup: false };
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9çáéíóúãõâêîôûàèìòù ]/g, '').trim();
+  const words = norm(title).split(' ').filter(w => w.length > 4);
+  for (const ex of titExistentes) {
+    const exNorm = norm(ex.title);
+    const overlap = words.filter(w => exNorm.includes(w));
+    if (overlap.length >= Math.max(3, Math.floor(words.length * 0.6))) {
+      return { dup: true, match: ex.title.substring(0, 50) + (ex.title.length > 50 ? '...' : ''), conta: ex.conta };
+    }
+  }
+  return { dup: false };
+}
+
+async function carregarExistentes(rerender) {
+  const btn = document.getElementById('tit-btn-existentes');
+  const status = document.getElementById('tit-existentes-status');
+  if (btn) { btn.disabled = true; btn.textContent = 'Carregando...'; }
+  if (status) status.textContent = '';
+  try {
+    const res = await fetch('/api/titulos/existentes');
+    const data = await res.json();
+    titExistentes = data;
+    if (status) status.textContent = `${data.length} títulos carregados`;
+    if (btn) { btn.textContent = `✓ ${data.length} títulos carregados`; }
+    if (rerender) {
+      const resultados = document.getElementById('tit-resultados');
+      if (resultados && resultados.children.length > 0 && resultados.querySelector('.card')) {
+        gerarTitulos();
+      }
+    }
+  } catch(e) {
+    if (status) status.textContent = 'Erro ao carregar';
+    if (btn) { btn.textContent = 'Carregar títulos existentes'; btn.disabled = false; }
+  }
+}
+
+function copyTit(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copiado!';
+    setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
+  });
+}
+</script>
+</body>
+</html>
