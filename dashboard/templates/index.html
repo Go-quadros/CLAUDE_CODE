@@ -503,13 +503,19 @@
         <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
         <line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
       </svg>
-      Calculadora de margem
+      Simulador de preços
     </button>
     <button class="nav-item" onclick="showScreen('relatorios', this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
       </svg>
-      Relat&oacute;rios semanais
+      Relat&oacute;rios
+    </button>
+    <button class="nav-item" onclick="showScreen('ads', this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-5"/>
+      </svg>
+      Product Ads Gap
     </button>
 
     <div class="nav-label">Contas</div>
@@ -544,13 +550,6 @@
         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
       </svg>
       Importar lista
-    </button>
-    <button class="nav-item" onclick="showScreen('medidas', this)">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
-        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
-      </svg>
-      Medidas e peso
     </button>
     <button class="nav-item" onclick="showScreen('titulos', this)">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -657,7 +656,7 @@
   <div class="screen" id="screen-calculadora">
     <div class="page-header">
       <div class="badge">Mercado Livre</div>
-      <h1>Calculadora de margem<br>de contribui&ccedil;&atilde;o</h1>
+      <h1>Simulador de preços</h1>
       <p>Preencha os campos para calcular automaticamente</p>
     </div>
 
@@ -796,58 +795,6 @@
     </div>
   </div>
 
-  <div class="screen" id="screen-medidas">
-    <div class="page-header">
-      <div class="badge">Catálogo</div>
-      <h1>Medidas e peso</h1>
-      <p>Atualize as dimensões e peso dos anúncios diretamente no Mercado Livre</p>
-    </div>
-
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px">
-      <select id="medidas-account" style="height:38px;padding:0 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px">
-        <option value="">Selecione a conta...</option>
-        {% for key, acc in accounts.items() %}
-          {% if acc.platform == 'ml' and acc.get('seller_id') %}
-          <option value="{{ key }}">{{ acc.name }}</option>
-          {% endif %}
-        {% endfor %}
-      </select>
-      <button id="btn-importar-anuncios" onclick="loadMedidas()" class="btn btn-primary" style="height:38px;padding:0 18px">Importar anúncios</button>
-      <input id="medidas-search" type="text" placeholder="Buscar por título ou ID..." oninput="renderMedidasTable()"
-        style="height:38px;padding:0 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;min-width:220px">
-      <span id="medidas-count" style="font-size:12px;color:var(--muted)"></span>
-      <button id="btn-salvar-medidas" onclick="salvarMedidas()" class="btn btn-primary" style="height:38px;padding:0 18px;margin-left:auto">Salvar alterações</button>
-    </div>
-
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px;background:var(--surface2);border-radius:10px;margin-bottom:16px">
-      <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Busca por ID</span>
-      <input id="single-item-id" type="text" placeholder="MLB4827503119" style="height:34px;padding:0 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-family:var(--font-mono);font-size:12px;width:160px">
-      <button onclick="loadSingleItem()" class="btn btn-ghost" style="height:34px;padding:0 14px;font-size:12px">Buscar</button>
-      <div id="single-item-result" style="display:none;align-items:center;gap:10px;flex:1;flex-wrap:wrap">
-        <img id="single-thumb" src="" style="width:36px;height:36px;object-fit:cover;border-radius:4px">
-        <div style="flex:1;min-width:0">
-          <div id="single-title" style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
-          <div id="single-dims" style="font-size:11px;color:var(--muted);font-family:var(--font-mono)"></div>
-        </div>
-        <input id="single-new-dims" type="text" placeholder="novas dimensões" style="height:34px;padding:0 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-family:var(--font-mono);font-size:12px;width:180px">
-        <button onclick="saveSingleItem()" class="btn btn-primary" style="height:34px;padding:0 14px;font-size:12px">Salvar</button>
-        <span id="single-status" style="font-size:12px;color:var(--accent)"></span>
-      </div>
-    </div>
-
-    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
-      Formato: <span style="font-family:var(--font-mono);font-size:11px;background:var(--surface2);padding:2px 8px;border-radius:4px">AlturaXLarguraXComprimento,PesoEmGramas</span>
-      &nbsp;— ex: <span style="font-family:var(--font-mono);font-size:11px">12x50x70,3000</span>
-    </div>
-    <div id="medidas-status" style="font-size:13px;color:var(--accent);margin-bottom:12px;min-height:18px"></div>
-
-    <div id="medidas-table-wrap" style="display:none">
-      <div class="table-wrap" style="overflow-x:auto">
-        <div id="medidas-table"></div>
-      </div>
-    </div>
-  </div>
-
   <div class="screen" id="screen-importar">
     <div class="page-header">
       <div class="badge">Administracao</div>
@@ -966,14 +913,20 @@
   <div class="screen" id="screen-relatorios">
     <div class="page-header">
       <div class="badge">Ferramentas</div>
-      <h1>Relat&oacute;rios semanais</h1>
-      <p>Gere os resumos semanais formatados para WhatsApp</p>
+      <h1>Relat&oacute;rios</h1>
+      <p>Resumos semanais para WhatsApp e fechamento mensal por canal</p>
     </div>
 
     <!-- Tabs -->
-    <div style="display:flex;gap:8px;margin-bottom:24px">
+    <div style="display:flex;gap:8px;margin-bottom:24px;align-items:center">
       <button id="tab-proj" onclick="switchTab('proj')" style="height:36px;padding:0 18px;border-radius:8px;font-family:var(--font-display);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:#fff">Projecoes Mensais</button>
       <button id="tab-comp" onclick="switchTab('comp')" style="height:36px;padding:0 18px;border-radius:8px;font-family:var(--font-display);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted)">Comparativo Real</button>
+      <button id="tab-fech" onclick="switchTab('fech')" style="height:36px;padding:0 18px;border-radius:8px;font-family:var(--font-display);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted)">Fechamento Mensal</button>
+      <div style="flex:1"></div>
+      <button onclick="exportarPDFUnificado(this)" style="height:36px;padding:0 18px;border-radius:8px;font-family:var(--font-display);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);display:flex;align-items:center;gap:6px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar PDF Unificado
+      </button>
     </div>
 
     <!-- ── Tab: Projecoes Mensais ── -->
@@ -1016,7 +969,15 @@
         </table>
       </div>
 
-      <button class="btn btn-primary" onclick="gerarProjecoes()" style="height:38px;padding:0 24px">Gerar resumo</button>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px">
+        <button class="btn btn-ghost" id="btn-fill-proj" onclick="autoFillMLProj(this)" style="height:38px;padding:0 18px;display:flex;align-items:center;gap:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Buscar ML
+        </button>
+        <span id="fill-proj-status" style="font-size:12px;color:var(--muted)"></span>
+        <div style="flex:1"></div>
+        <button class="btn btn-primary" onclick="gerarProjecoes()" style="height:38px;padding:0 24px">Gerar resumo</button>
+      </div>
 
       <div id="proj-output" style="display:none;margin-top:20px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -1061,7 +1022,15 @@
         </table>
       </div>
 
-      <button class="btn btn-primary" onclick="gerarComparativo()" style="height:38px;padding:0 24px">Gerar comparativo</button>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px">
+        <button class="btn btn-ghost" id="btn-fill-comp" onclick="autoFillMLComp(this)" style="height:38px;padding:0 18px;display:flex;align-items:center;gap:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Buscar ML
+        </button>
+        <span id="fill-comp-status" style="font-size:12px;color:var(--muted)"></span>
+        <div style="flex:1"></div>
+        <button class="btn btn-primary" onclick="gerarComparativo()" style="height:38px;padding:0 24px">Gerar comparativo</button>
+      </div>
 
       <div id="comp-output" style="display:none;margin-top:20px">
         <!-- Tabela visual -->
@@ -1082,7 +1051,175 @@
           <button onclick="copiarTexto('comp-texto')" style="font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:var(--font-display)">Copiar</button>
         </div>
         <pre id="comp-texto" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;font-family:var(--font-mono);font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word"></pre>
+
+        <!-- Análise automática -->
+        <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted)">Análise automática</p>
+            <button onclick="copiarTexto('analise-texto')" style="font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:var(--font-display)">Copiar</button>
+          </div>
+          <pre id="analise-texto" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;font-family:var(--font-mono);font-size:12px;line-height:1.8;white-space:pre-wrap;word-break:break-word"></pre>
+        </div>
       </div>
+    </div>
+
+    <!-- ── Tab: Fechamento Mensal ── -->
+    <div id="tab-fech-content" style="display:none">
+      <!-- Linha 1: cabeçalho do mês -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+        <div>
+          <label class="field-label">Mês de referência</label>
+          <input id="fech-mes" class="field-input" placeholder="Agosto 2026" />
+        </div>
+        <div>
+          <label class="field-label">Mês anterior</label>
+          <input id="fech-mes-ant" class="field-input" placeholder="Julho" />
+        </div>
+        <div>
+          <label class="field-label">Meta líquida do mês (R$)</label>
+          <input id="fech-meta" class="field-input" type="text" placeholder="1.932.000,00" />
+        </div>
+        <div>
+          <label class="field-label">Inv. TikTok s/ bônus (R$)</label>
+          <input id="fech-tiktok-bonus" class="field-input" type="text" placeholder="4.880,00" />
+        </div>
+      </div>
+
+      <!-- Tabela de canais -->
+      <div class="table-wrap" style="margin-bottom:8px">
+        <table>
+          <thead><tr>
+            <th>Canal</th>
+            <th>Bruto (R$)</th>
+            <th>Líquido (R$)</th>
+            <th>Investimento (R$)</th>
+            <th>Var% vs. mês ant.</th>
+          </tr></thead>
+          <tbody id="fech-tbody"></tbody>
+        </table>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:20px">Dif%, ROAS e ACOS são calculados automaticamente. A variação comparativa é inserida manualmente (ex: <strong>-16</strong> para -16% ou <strong>+61</strong> para +61%).</p>
+
+      <!-- Totais do mês anterior para comparativo -->
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px">
+        <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:12px">Totais do mês anterior (para tabela de consolidado)</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:12px">
+          <div>
+            <label class="field-label">Bruto total ant. (R$)</label>
+            <input id="fech-ant-bruto" class="field-input" type="text" placeholder="1.703.248,00" />
+          </div>
+          <div>
+            <label class="field-label">Líquido total ant. (R$)</label>
+            <input id="fech-ant-liq" class="field-input" type="text" placeholder="1.606.314,00" />
+          </div>
+          <div>
+            <label class="field-label">Share ML ant. (%)</label>
+            <input id="fech-ant-share-ml" class="field-input" type="number" placeholder="26" />
+          </div>
+          <div>
+            <label class="field-label">Share Shopee ant. (%)</label>
+            <input id="fech-ant-share-shopee" class="field-input" type="number" placeholder="68" />
+          </div>
+          <div>
+            <label class="field-label">Share TikTok ant. (%)</label>
+            <input id="fech-ant-share-tiktok" class="field-input" type="number" placeholder="6" />
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-bottom:24px">
+        <button class="btn btn-primary" onclick="gerarFechamento()" style="height:38px;padding:0 24px">Gerar fechamento</button>
+      </div>
+
+      <!-- Preview do relatório -->
+      <div id="fech-output" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted)">Prévia do relatório</p>
+          <button onclick="exportarFechamentoPDF()" style="font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:var(--font-display);display:flex;align-items:center;gap:5px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar PDF
+          </button>
+        </div>
+        <div id="fech-preview" style="background:#fff;color:#111;border:1px solid var(--border);border-radius:12px;padding:32px;font-family:'Inter',sans-serif;font-size:14px;line-height:1.5"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen: Product Ads Gap -->
+  <div class="screen" id="screen-ads">
+    <div class="page-header">
+      <div class="badge">Mercado Livre</div>
+      <h1>Product Ads Gap</h1>
+      <p>Identifica itens com vendas que <strong>n&atilde;o est&atilde;o</strong> em nenhuma campanha de Product Ads</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Conta</label>
+        <select id="ads-conta" style="width:200px">
+          <option value="nova_gq">GQ Decoração — nova_gq</option>
+        </select>
+      </div>
+      <div class="filters-right">
+        <span id="ads-mode-badge" style="font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;background:var(--surface2);color:var(--muted)">—</span>
+        <span class="last-update" id="ads-last-update"></span>
+        <button class="btn btn-primary" onclick="runAdsGap()" id="ads-run-btn">Analisar agora</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="number" id="ads-stat-total">—</div>
+        <div class="label">Itens com vendas</div>
+      </div>
+      <div class="stat-card">
+        <div class="number" id="ads-stat-in">—</div>
+        <div class="label">Em campanhas</div>
+      </div>
+      <div class="stat-card" style="border-color:var(--amber)">
+        <div class="number" id="ads-stat-gap" style="color:var(--amber)">—</div>
+        <div class="label">Fora das campanhas</div>
+      </div>
+    </div>
+
+    <!-- Loading / error -->
+    <div id="ads-loading" style="display:none;padding:32px;text-align:center;color:var(--muted);font-size:14px">Puxando dados do Mercado Livre… aguarde.</div>
+    <div id="ads-error" style="display:none;padding:16px;border:1px solid var(--danger);border-radius:10px;color:var(--danger);font-size:13px;margin-bottom:16px"></div>
+
+    <!-- Gap table -->
+    <div id="ads-gap-section" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Itens com vendas fora das campanhas</p>
+        <button onclick="copiarIdsGap()" style="font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:var(--font-display)">Copiar IDs</button>
+      </div>
+      <div class="table-wrap">
+        <table id="ads-gap-table">
+          <thead><tr>
+            <th>Item ID</th>
+            <th>T&iacute;tulo</th>
+            <th style="text-align:right">Vendas</th>
+            <th style="text-align:right">Pre&ccedil;o</th>
+          </tr></thead>
+          <tbody id="ads-gap-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Manual mode section -->
+    <div class="card" style="padding:20px;margin-top:24px">
+      <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px">Modo manual — IDs das campanhas</p>
+      <p style="font-size:13px;color:var(--text-2,var(--muted));margin-bottom:14px;line-height:1.5">
+        Cole aqui os IDs dos itens que j&aacute; est&atilde;o em Product Ads (um por linha ou separados por v&iacute;rgula).<br>
+        Exporte a lista de cada campanha no painel do ML e cole o MLB... de cada linha.
+      </p>
+      <textarea id="ads-manual-ids" rows="6" placeholder="MLB4819432823&#10;MLB1234567890&#10;MLB..." style="width:100%;box-sizing:border-box;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-family:var(--font-mono);font-size:12px;resize:vertical;outline:none"></textarea>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:10px">
+        <button class="btn btn-primary" onclick="saveManualIds()" style="height:36px;padding:0 20px;font-size:13px">Salvar lista</button>
+        <span id="ads-manual-status" style="font-size:12px;color:var(--muted)"></span>
+      </div>
+      <p id="ads-manual-updated" style="font-size:11px;color:var(--muted);margin-top:8px"></p>
     </div>
   </div>
 
@@ -1195,6 +1332,317 @@ function showScreen(name, btn) {
   if (name === 'usuarios') loadUsers();
   if (name === 'importar') loadClipsCount();
   if (name === 'relatorios') initRelatorios();
+  if (name === 'ads') initAdsGap();
+}
+
+// ── Sales auto-fill helpers ───────────────────────────────────────────────────
+
+const ML_CANAL_IDS = ['ml1', 'ml2'];
+
+function _brlInput(v) {
+  return Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function _parseDDMM(s) {
+  const parts = String(s || '').trim().split('/');
+  if (parts.length !== 2) return null;
+  const dd = parts[0].padStart(2, '0');
+  const mm = parts[1].padStart(2, '0');
+  const year = new Date().getFullYear();
+  return `${year}-${mm}-${dd}`;
+}
+
+async function _saveManual(tab) {
+  const values = {};
+  if (tab === 'proj') {
+    CANAIS.forEach(c => {
+      ['fat', 'ant'].forEach(f => {
+        const el = document.getElementById(`proj-${f}-${c.id}`);
+        if (el && el.value.trim()) values[`proj-${f}-${c.id}`] = el.value.trim();
+      });
+    });
+  } else {
+    CANAIS.forEach(c => {
+      ['f1','i1','f2','i2'].forEach(f => {
+        const el = document.getElementById(`comp-${f}-${c.id}`);
+        if (el && el.value.trim()) values[`comp-${f}-${c.id}`] = el.value.trim();
+      });
+    });
+  }
+  try {
+    const existing = await fetch('/api/sales/manual').then(r => r.json()).catch(() => ({}));
+    const merged = {...(existing || {}), ...values};
+    await fetch('/api/sales/manual', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({values: merged}),
+    });
+  } catch(e) {}
+}
+
+async function _loadManual() {
+  try {
+    const hist = await fetch('/api/sales/manual').then(r => r.json());
+    if (!hist || typeof hist !== 'object') return;
+    CANAIS.forEach(c => {
+      ['fat', 'ant'].forEach(f => {
+        const key = `proj-${f}-${c.id}`;
+        const el = document.getElementById(key);
+        if (el && hist[key]) el.value = hist[key];
+      });
+      ['f1','i1','f2','i2'].forEach(f => {
+        const key = `comp-${f}-${c.id}`;
+        const el = document.getElementById(key);
+        if (el && hist[key]) el.value = hist[key];
+      });
+    });
+  } catch(e) {}
+}
+
+async function autoFillMLProj(btn) {
+  btn.disabled = true;
+  const origText = btn.innerHTML;
+  btn.innerHTML = 'Buscando…';
+  const status = document.getElementById('fill-proj-status');
+  status.textContent = '';
+
+  try {
+    const hoje = new Date();
+    const ano  = hoje.getFullYear();
+    const mes  = String(hoje.getMonth() + 1).padStart(2, '0');
+    const diasDec = parseInt(document.getElementById('p-dias-dec').value, 10) || hoje.getDate() - 1;
+    const diaStr  = String(Math.min(diasDec, 31)).padStart(2, '0');
+
+    const fromCurr = `${ano}-${mes}-01`;
+    const toCurr   = `${ano}-${mes}-${diaStr}`;
+
+    const prevD    = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
+    const prevAno  = prevD.getFullYear();
+    const prevMes  = String(prevD.getMonth() + 1).padStart(2, '0');
+    const lastDayP = new Date(hoje.getFullYear(), hoje.getMonth(), 0).getDate();
+    const fromPrev = `${prevAno}-${prevMes}-01`;
+    const toPrev   = `${prevAno}-${prevMes}-${String(lastDayP).padStart(2,'0')}`;
+
+    const [r1, r2] = await Promise.all([
+      fetch(`/api/sales/collect?from=${fromCurr}&to=${toCurr}`).then(r => r.json()),
+      fetch(`/api/sales/collect?from=${fromPrev}&to=${toPrev}`).then(r => r.json()),
+    ]);
+
+    let filled = 0;
+    for (const [cid, total] of Object.entries(r1.results || {})) {
+      const el = document.getElementById(`proj-fat-${cid}`);
+      if (el) { el.value = _brlInput(total); el.style.outline = '2px solid var(--accent)'; filled++; }
+    }
+    for (const [cid, total] of Object.entries(r2.results || {})) {
+      const el = document.getElementById(`proj-ant-${cid}`);
+      if (el) { el.value = _brlInput(total); el.style.outline = '2px solid var(--accent)'; }
+    }
+    status.textContent = `ML preenchido (${fromCurr} → ${toCurr})`;
+    status.style.color = 'var(--accent)';
+    if (filled === 0) {
+      status.textContent = 'Nenhum canal ML retornou dados para o período.';
+      status.style.color = 'var(--amber, #f59e0b)';
+    }
+  } catch(e) {
+    status.textContent = 'Erro: ' + e.message;
+    status.style.color = 'var(--danger)';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origText;
+  }
+}
+
+async function autoFillMLComp(btn) {
+  btn.disabled = true;
+  const origText = btn.innerHTML;
+  btn.innerHTML = 'Buscando…';
+  const status = document.getElementById('fill-comp-status');
+  status.textContent = '';
+
+  try {
+    const p1i = _parseDDMM(document.getElementById('c-p1-inicio').value);
+    const p1f = _parseDDMM(document.getElementById('c-p1-fim').value);
+    const p2i = _parseDDMM(document.getElementById('c-p2-inicio').value);
+    const p2f = _parseDDMM(document.getElementById('c-p2-fim').value);
+
+    if (!p1i || !p1f || !p2i || !p2f) {
+      status.textContent = 'Preencha as datas dos dois períodos (DD/MM).';
+      status.style.color = 'var(--danger)';
+      return;
+    }
+
+    const [r1, r2] = await Promise.all([
+      fetch(`/api/sales/collect?from=${p1i}&to=${p1f}`).then(r => r.json()),
+      fetch(`/api/sales/collect?from=${p2i}&to=${p2f}`).then(r => r.json()),
+    ]);
+
+    let filled = 0;
+    for (const [cid, total] of Object.entries(r1.results || {})) {
+      const el = document.getElementById(`comp-f1-${cid}`);
+      if (el) { el.value = _brlInput(total); el.style.outline = '2px solid var(--accent)'; filled++; }
+    }
+    for (const [cid, total] of Object.entries(r2.results || {})) {
+      const el = document.getElementById(`comp-f2-${cid}`);
+      if (el) { el.value = _brlInput(total); el.style.outline = '2px solid var(--accent)'; }
+    }
+    status.textContent = `ML preenchido — P1: ${p1i.slice(8)}/${p1i.slice(5,7)} → ${p1f.slice(8)}/${p1f.slice(5,7)} | P2: ${p2i.slice(8)}/${p2i.slice(5,7)} → ${p2f.slice(8)}/${p2f.slice(5,7)}`;
+    status.style.color = filled ? 'var(--accent)' : 'var(--amber, #f59e0b)';
+    if (!filled) status.textContent = 'Nenhum canal ML retornou dados.';
+  } catch(e) {
+    status.textContent = 'Erro: ' + e.message;
+    status.style.color = 'var(--danger)';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origText;
+  }
+}
+
+// ── Product Ads Gap ──────────────────────────────────────────────────────────
+let _adsGapData = [];
+
+async function initAdsGap() {
+  const conta = document.getElementById('ads-conta').value;
+  try {
+    const cfg = await fetch(`/api/ads-config/${conta}`).then(r => r.json());
+    if (cfg.manual_ad_items && cfg.manual_ad_items.length > 0) {
+      document.getElementById('ads-manual-ids').value = cfg.manual_ad_items.join('\n');
+    }
+    if (cfg.manual_updated) {
+      document.getElementById('ads-manual-updated').textContent =
+        'Lista manual atualizada em: ' + new Date(cfg.manual_updated).toLocaleString('pt-BR');
+    }
+    if (cfg.last_updated) {
+      document.getElementById('ads-last-update').textContent =
+        'Última análise: ' + new Date(cfg.last_updated).toLocaleString('pt-BR');
+      // Mostra cache se existir
+      if (cfg.cached_gap && cfg.cached_gap.length > 0) {
+        _renderAdsGap({
+          api_mode: false,
+          total_com_vendas: (cfg.manual_ad_items || []).length + cfg.cached_gap.length,
+          em_campanhas: (cfg.manual_ad_items || []).length,
+          fora_de_campanhas: cfg.cached_gap.length,
+          gap: cfg.cached_gap,
+          timestamp: cfg.last_updated,
+          from_cache: true,
+        });
+      }
+    }
+  } catch(e) { /* silencioso */ }
+}
+
+async function runAdsGap() {
+  const conta = document.getElementById('ads-conta').value;
+  const btn = document.getElementById('ads-run-btn');
+  const loading = document.getElementById('ads-loading');
+  const errEl = document.getElementById('ads-error');
+
+  btn.disabled = true;
+  btn.textContent = 'Analisando…';
+  loading.style.display = 'block';
+  errEl.style.display = 'none';
+  document.getElementById('ads-gap-section').style.display = 'none';
+
+  try {
+    const res = await fetch(`/api/ads-gap/${conta}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
+    _renderAdsGap(data);
+  } catch(e) {
+    errEl.textContent = 'Erro: ' + e.message;
+    errEl.style.display = 'block';
+  } finally {
+    loading.style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = 'Analisar agora';
+  }
+}
+
+function _renderAdsGap(data) {
+  _adsGapData = data.gap || [];
+  document.getElementById('ads-stat-total').textContent = data.total_com_vendas ?? '—';
+  document.getElementById('ads-stat-in').textContent = data.em_campanhas ?? '—';
+  document.getElementById('ads-stat-gap').textContent = data.fora_de_campanhas ?? '—';
+
+  const badge = document.getElementById('ads-mode-badge');
+  if (data.from_cache) {
+    badge.textContent = 'Cache';
+    badge.style.background = 'var(--surface2)';
+    badge.style.color = 'var(--muted)';
+  } else if (data.api_mode) {
+    badge.textContent = 'API automática ✓';
+    badge.style.background = '#d1fae5';
+    badge.style.color = '#065f46';
+  } else {
+    badge.textContent = 'Modo manual';
+    badge.style.background = '#fef3c7';
+    badge.style.color = '#92400e';
+  }
+
+  if (data.timestamp) {
+    document.getElementById('ads-last-update').textContent =
+      'Última análise: ' + new Date(data.timestamp).toLocaleString('pt-BR');
+  }
+
+  const tbody = document.getElementById('ads-gap-tbody');
+  tbody.innerHTML = '';
+  if (_adsGapData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px">Todos os itens com vendas já estão em campanhas 🎉</td></tr>';
+  } else {
+    _adsGapData.forEach(it => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><a href="https://produto.mercadolivre.com.br/${it.id}" target="_blank" style="color:var(--accent);font-family:var(--font-mono);font-size:12px">${it.id}</a></td>
+        <td style="max-width:340px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${it.titulo}">${it.titulo}</td>
+        <td style="text-align:right;font-weight:600">${it.vendidos}</td>
+        <td style="text-align:right">R$ ${Number(it.preco).toFixed(2)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+  document.getElementById('ads-gap-section').style.display = 'block';
+}
+
+async function saveManualIds() {
+  const conta = document.getElementById('ads-conta').value;
+  const raw = document.getElementById('ads-manual-ids').value;
+  const ids = raw.split(/[\n,]+/).map(s => s.trim()).filter(s => /^MLB\d+$/i.test(s));
+  const statusEl = document.getElementById('ads-manual-status');
+
+  if (ids.length === 0) {
+    statusEl.textContent = 'Nenhum ID válido encontrado (formato: MLB123...).';
+    statusEl.style.color = 'var(--danger)';
+    return;
+  }
+
+  statusEl.textContent = 'Salvando…';
+  statusEl.style.color = 'var(--muted)';
+  try {
+    const res = await fetch(`/api/ads-config/${conta}/items`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({items: ids}),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      statusEl.textContent = `${data.count} IDs salvos com sucesso.`;
+      statusEl.style.color = 'var(--accent)';
+      document.getElementById('ads-manual-updated').textContent =
+        'Lista manual atualizada em: ' + new Date().toLocaleString('pt-BR');
+    }
+  } catch(e) {
+    statusEl.textContent = 'Erro ao salvar: ' + e.message;
+    statusEl.style.color = 'var(--danger)';
+  }
+}
+
+function copiarIdsGap() {
+  const ids = _adsGapData.map(it => it.id).join('\n');
+  if (!ids) return;
+  navigator.clipboard.writeText(ids).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Copiado!';
+    setTimeout(() => btn.textContent = 'Copiar IDs', 1500);
+  });
 }
 
 // ── Users ──
@@ -1538,34 +1986,293 @@ function initRelatorios() {
 
   // Monta linhas da tabela de projecoes
   const projTbody = document.getElementById('proj-tbody');
-  projTbody.innerHTML = CANAIS.map(c => `
-    <tr>
-      <td style="font-weight:500">${c.label}</td>
+  projTbody.innerHTML = CANAIS.map(c => {
+    const isML = ML_CANAL_IDS.includes(c.id);
+    const mlBadge = isML ? `<span style="font-size:9px;background:var(--accent);color:#fff;border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:middle">API</span>` : '';
+    return `<tr>
+      <td style="font-weight:500">${c.label}${mlBadge}</td>
       <td><input class="field-input" id="proj-fat-${c.id}" type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
       <td><input class="field-input" id="proj-ant-${c.id}" type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 
   // Monta linhas da tabela de comparativo
   const compTbody = document.getElementById('comp-tbody');
-  compTbody.innerHTML = CANAIS.map(c => `
-    <tr>
-      <td style="font-weight:500">${c.label}</td>
-      <td><input class="field-input" id="comp-f1-${c.id}" type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
+  compTbody.innerHTML = CANAIS.map(c => {
+    const isML = ML_CANAL_IDS.includes(c.id);
+    const mlBadge = isML ? `<span style="font-size:9px;background:var(--accent);color:#fff;border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:middle">API</span>` : '';
+    const fatPlaceholder = isML ? 'Auto (ML)' : '0,00';
+    return `<tr>
+      <td style="font-weight:500">${c.label}${mlBadge}</td>
+      <td><input class="field-input" id="comp-f1-${c.id}" type="text" placeholder="${fatPlaceholder}" style="height:32px;font-size:12px" /></td>
       <td><input class="field-input" id="comp-i1-${c.id}" type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
-      <td><input class="field-input" id="comp-f2-${c.id}" type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
+      <td><input class="field-input" id="comp-f2-${c.id}" type="text" placeholder="${fatPlaceholder}" style="height:32px;font-size:12px" /></td>
       <td><input class="field-input" id="comp-i2-${c.id}" type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
+
+  // Pré-carrega valores manuais salvos (Shopee, TikTok, e investimentos ML)
+  _loadManual();
 }
 
 function switchTab(tab) {
-  document.getElementById('tab-proj-content').style.display = tab === 'proj' ? '' : 'none';
-  document.getElementById('tab-comp-content').style.display = tab === 'comp' ? '' : 'none';
-  document.getElementById('tab-proj').style.background = tab === 'proj' ? 'var(--accent)' : 'var(--surface)';
-  document.getElementById('tab-proj').style.color = tab === 'proj' ? '#fff' : 'var(--muted)';
-  document.getElementById('tab-proj').style.borderColor = tab === 'proj' ? 'var(--accent)' : 'var(--border)';
-  document.getElementById('tab-comp').style.background = tab === 'comp' ? 'var(--accent)' : 'var(--surface)';
-  document.getElementById('tab-comp').style.color = tab === 'comp' ? '#fff' : 'var(--muted)';
-  document.getElementById('tab-comp').style.borderColor = tab === 'comp' ? 'var(--accent)' : 'var(--border)';
+  const tabs = ['proj', 'comp', 'fech'];
+  tabs.forEach(t => {
+    const content = document.getElementById('tab-' + t + '-content');
+    const btn     = document.getElementById('tab-' + t);
+    if (!content || !btn) return;
+    const active = t === tab;
+    content.style.display   = active ? '' : 'none';
+    btn.style.background    = active ? 'var(--accent)' : 'var(--surface)';
+    btn.style.color         = active ? '#fff' : 'var(--muted)';
+    btn.style.borderColor   = active ? 'var(--accent)' : 'var(--border)';
+  });
+  if (tab === 'fech') _initFechamento();
+}
+
+const FECH_CANAIS = [
+  { id: 'shopee1', label: 'Shopee 1', sublabel: 'GQ Decoração',        cor: '#EE4D2D' },
+  { id: 'shopee2', label: 'Shopee 2', sublabel: 'Freewall Decoração',   cor: '#EE4D2D' },
+  { id: 'ml1',     label: 'Mercado Livre 1', sublabel: 'Freewall Decoração', cor: '#FFBF00' },
+  { id: 'ml2',     label: 'Mercado Livre 2', sublabel: 'GQ Decoração [Nova]', cor: '#FFBF00' },
+  { id: 'tiktok',  label: 'TikTok Shop', sublabel: '',                  cor: '#111' },
+];
+
+function _initFechamento() {
+  const tbody = document.getElementById('fech-tbody');
+  if (tbody.dataset.built) return;
+  tbody.dataset.built = '1';
+  tbody.innerHTML = FECH_CANAIS.map(c => `
+    <tr>
+      <td style="font-weight:500">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c.cor};margin-right:6px;vertical-align:middle"></span>
+        ${c.label}<span style="color:var(--muted);font-weight:400"> — ${c.sublabel}</span>
+      </td>
+      <td><input class="field-input" id="fech-bruto-${c.id}" type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
+      <td><input class="field-input" id="fech-liq-${c.id}"   type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
+      <td><input class="field-input" id="fech-inv-${c.id}"   type="text" placeholder="0,00" style="height:32px;font-size:12px" /></td>
+      <td><input class="field-input" id="fech-var-${c.id}"   type="text" placeholder="+0" style="height:32px;font-size:12px;width:80px" /></td>
+    </tr>`).join('');
+}
+
+function _fmtBRL(v) {
+  return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+function _pct(v, dec=2) { return Number(v).toFixed(dec) + '%'; }
+
+function gerarFechamento() {
+  const mes    = document.getElementById('fech-mes').value.trim()    || 'Mês';
+  const mesAnt = document.getElementById('fech-mes-ant').value.trim() || 'Ant';
+  const meta   = parseBRL(document.getElementById('fech-meta').value) || 0;
+  const bonusTiktok = parseBRL(document.getElementById('fech-tiktok-bonus').value) || 0;
+  const antBruto = parseBRL(document.getElementById('fech-ant-bruto').value) || 0;
+  const antLiq   = parseBRL(document.getElementById('fech-ant-liq').value)   || 0;
+  const antShareML     = Number(document.getElementById('fech-ant-share-ml').value)     || 0;
+  const antShareShopee = Number(document.getElementById('fech-ant-share-shopee').value) || 0;
+  const antShareTiktok = Number(document.getElementById('fech-ant-share-tiktok').value) || 0;
+
+  const canaisData = FECH_CANAIS.map(c => {
+    const bruto = parseBRL(document.getElementById('fech-bruto-' + c.id).value) || 0;
+    const liq   = parseBRL(document.getElementById('fech-liq-'   + c.id).value) || 0;
+    const inv   = parseBRL(document.getElementById('fech-inv-'   + c.id).value) || 0;
+    const varRaw = document.getElementById('fech-var-' + c.id).value.trim();
+    const varNum = parseFloat(varRaw.replace(',', '.')) || null;
+    const dif  = bruto > 0 ? (bruto - liq) / bruto * 100 : 0;
+    const roas = inv   > 0 ? liq / inv : 0;
+    const acos = liq   > 0 ? inv / liq * 100 : 0;
+    return { ...c, bruto, liq, inv, dif, roas, acos, varNum, varRaw };
+  });
+
+  const totBruto = canaisData.reduce((s, c) => s + c.bruto, 0);
+  const totLiq   = canaisData.reduce((s, c) => s + c.liq,   0);
+  const varBruto = antBruto > 0 ? (totBruto - antBruto) / antBruto * 100 : null;
+  const varLiq   = antLiq   > 0 ? (totLiq   - antLiq)   / antLiq   * 100 : null;
+  const difBruto = totBruto - antBruto;
+  const difLiq   = totLiq   - antLiq;
+
+  // Share atual
+  const mlLiq     = canaisData.filter(c => c.id.startsWith('ml')).reduce((s, c) => s + c.liq, 0);
+  const shopeeLiq = canaisData.filter(c => c.id.startsWith('shopee')).reduce((s, c) => s + c.liq, 0);
+  const tiktokLiq = canaisData.find(c => c.id === 'tiktok')?.liq || 0;
+  const shareML     = totLiq > 0 ? mlLiq / totLiq * 100 : 0;
+  const shareShopee = totLiq > 0 ? shopeeLiq / totLiq * 100 : 0;
+  const shareTiktok = totLiq > 0 ? tiktokLiq / totLiq * 100 : 0;
+
+  // Meta
+  const metaDif  = totLiq - meta;
+  const metaPct  = meta > 0 ? metaDif / meta * 100 : null;
+
+  function varBadge(v) {
+    if (v === null) return '';
+    const sign = v >= 0 ? '▲' : '▼';
+    const col  = v >= 0 ? '#16a34a' : '#dc2626';
+    const abs  = Math.abs(v);
+    return `<span style="font-size:12px;font-weight:600;color:${col};white-space:nowrap">${sign} ${abs % 1 === 0 ? abs.toFixed(0) : abs.toFixed(0)}%</span>`;
+  }
+  function varBadgeAbs(diff, pct) {
+    if (pct === null) return '';
+    const sign = pct >= 0 ? '▲' : '▼';
+    const col  = pct >= 0 ? '#16a34a' : '#dc2626';
+    return `<span style="font-weight:700;color:${col}">${sign} ${Math.abs(pct).toFixed(0)}% <span style="font-size:12px">+R$ ${Math.abs(diff).toLocaleString('pt-BR', {maximumFractionDigits:0})}</span></span>`;
+  }
+
+  const canalCards = canaisData.map(c => {
+    const varLabel = c.varNum !== null
+      ? `<span style="font-size:12px;font-weight:600;color:${c.varNum >= 0 ? '#16a34a' : '#dc2626'}">${c.varNum >= 0 ? '▲' : '▼'} ${c.varNum >= 0 ? '+' : ''}${c.varNum}% vs. ${mesAnt}</span>`
+      : '';
+    const tiktokBonusRow = (c.id === 'tiktok' && bonusTiktok > 0)
+      ? `<div style="font-size:11px;color:#6b7280;margin-top:6px">Investimento s/ bônus: ${_fmtBRL(bonusTiktok)}</div>` : '';
+    return `
+    <div style="border:1px solid #e5e7eb;border-radius:10px;padding:18px 20px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c.cor}"></span>
+        <strong>${c.label}</strong>${c.sublabel ? ` — ${c.sublabel}` : ''}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 60px 1fr 80px 70px 1fr;gap:8px;align-items:end">
+        <div>
+          <div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Faturado Bruto</div>
+          <div style="font-size:20px;font-weight:700;color:#111">${_fmtBRL(c.bruto)}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Faturado Líquido</div>
+          <div style="font-size:20px;font-weight:700;color:#111">${_fmtBRL(c.liq)}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Dif.</div>
+          <div style="font-size:14px;font-weight:600;color:#374151">${c.dif.toFixed(0)}%</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Investimento</div>
+          <div style="font-size:14px;font-weight:600;color:#374151">${_fmtBRL(c.inv)}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">ROAS</div>
+          <div style="font-size:14px;font-weight:700;color:#111">${c.roas.toFixed(2)}x</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">ACOS</div>
+          <div style="font-size:14px;font-weight:600;color:#374151">${c.acos.toFixed(2)}%</div>
+        </div>
+        <div style="text-align:right">${varLabel}</div>
+      </div>
+      ${tiktokBonusRow}
+    </div>`;
+  }).join('');
+
+  const preview = document.getElementById('fech-preview');
+  preview.innerHTML = `
+    <div style="max-width:820px;margin:0 auto;font-family:'Inter',sans-serif;color:#111">
+      <!-- Título -->
+      <div style="margin-bottom:24px;border-bottom:2px solid #111;padding-bottom:16px;display:flex;justify-content:space-between;align-items:flex-end">
+        <div>
+          <div style="font-size:28px;font-weight:800;line-height:1.1">Fechamento Mensal</div>
+          <div style="font-size:22px;font-weight:700;color:#374151">Marketplaces — ${mes.split(' ')[0]}</div>
+        </div>
+        <div style="font-size:13px;color:#6b7280">${mes}</div>
+      </div>
+
+      <!-- Cards por canal -->
+      ${canalCards}
+
+      <!-- Tabelas consolidadas -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:20px">
+
+        <!-- Totais Consolidados -->
+        <div style="border:1px solid #e5e7eb;border-radius:10px;padding:16px">
+          <div style="font-size:13px;font-weight:700;color:#111;margin-bottom:12px">Totais Consolidados</div>
+          <table style="width:100%;font-size:13px;border-collapse:collapse">
+            <thead><tr>
+              <th style="text-align:left;font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;padding-bottom:6px"></th>
+              <th style="text-align:right;font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;padding-bottom:6px">${mes.split(' ')[0]}</th>
+              ${antBruto > 0 ? `<th style="text-align:right;font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;padding-bottom:6px">${mesAnt}</th>` : ''}
+            </tr></thead>
+            <tbody>
+              <tr style="border-top:1px solid #f3f4f6">
+                <td style="padding:5px 0;color:#374151;font-weight:500">Bruto</td>
+                <td style="padding:5px 0;text-align:right;font-weight:700">${_fmtBRL(totBruto)}</td>
+                ${antBruto > 0 ? `<td style="padding:5px 0;text-align:right;color:#6b7280">${_fmtBRL(antBruto)}</td>` : ''}
+              </tr>
+              <tr style="border-top:1px solid #f3f4f6">
+                <td style="padding:5px 0;color:#374151;font-weight:500">Líquido</td>
+                <td style="padding:5px 0;text-align:right;font-weight:700">${_fmtBRL(totLiq)}</td>
+                ${antLiq > 0 ? `<td style="padding:5px 0;text-align:right;color:#6b7280">${_fmtBRL(antLiq)}</td>` : ''}
+              </tr>
+              ${varLiq !== null ? `<tr style="border-top:1px solid #f3f4f6">
+                <td style="padding:5px 0;color:#374151;font-weight:500">Var.</td>
+                <td style="padding:5px 0;text-align:right;font-size:12px">${varBadgeAbs(difLiq, varLiq)}</td>
+                ${antBruto > 0 ? `<td style="padding:5px 0;text-align:right;font-size:12px">${varBadgeAbs(difBruto, varBruto)}</td>` : ''}
+              </tr>` : ''}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Share Líquido -->
+        <div style="border:1px solid #e5e7eb;border-radius:10px;padding:16px">
+          <div style="font-size:13px;font-weight:700;color:#111;margin-bottom:12px">Share Líquido</div>
+          <table style="width:100%;font-size:13px;border-collapse:collapse">
+            <thead><tr>
+              <th style="text-align:left;font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;padding-bottom:6px">Canal</th>
+              <th style="text-align:right;font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;padding-bottom:6px">${mes.split(' ')[0].slice(0,3)}</th>
+              ${antShareML > 0 ? `<th style="text-align:right;font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;padding-bottom:6px">${mesAnt.slice(0,3)}</th>` : ''}
+            </tr></thead>
+            <tbody>
+              <tr style="border-top:1px solid #f3f4f6">
+                <td style="padding:5px 0;color:#374151;font-weight:500">Mercado Livre</td>
+                <td style="padding:5px 0;text-align:right;font-weight:700">${shareML.toFixed(0)}%</td>
+                ${antShareML > 0 ? `<td style="padding:5px 0;text-align:right;color:#6b7280">${antShareML}%</td>` : ''}
+              </tr>
+              <tr style="border-top:1px solid #f3f4f6">
+                <td style="padding:5px 0;color:#374151;font-weight:500">Shopee</td>
+                <td style="padding:5px 0;text-align:right;font-weight:700">${shareShopee.toFixed(0)}%</td>
+                ${antShareShopee > 0 ? `<td style="padding:5px 0;text-align:right;color:#6b7280">${antShareShopee}%</td>` : ''}
+              </tr>
+              <tr style="border-top:1px solid #f3f4f6">
+                <td style="padding:5px 0;color:#374151;font-weight:500">TikTok</td>
+                <td style="padding:5px 0;text-align:right;font-weight:700">${shareTiktok.toFixed(0)}%</td>
+                ${antShareTiktok > 0 ? `<td style="padding:5px 0;text-align:right;color:#6b7280">${antShareTiktok}%</td>` : ''}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Meta vs. Atingido -->
+        <div style="border:1px solid #e5e7eb;border-radius:10px;padding:16px">
+          <div style="font-size:13px;font-weight:700;color:#111;margin-bottom:12px">Meta vs. Atingido</div>
+          <div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">${mes.split(' ')[0]}</div>
+          <table style="width:100%;font-size:13px;border-collapse:collapse">
+            <tbody>
+              <tr style="border-top:1px solid #f3f4f6">
+                <td style="padding:5px 0;color:#374151;font-weight:500">Meta</td>
+                <td style="padding:5px 0;text-align:right;font-weight:700">${_fmtBRL(meta)}</td>
+              </tr>
+              <tr style="border-top:1px solid #f3f4f6">
+                <td style="padding:5px 0;color:#374151;font-weight:500">Atingido</td>
+                <td style="padding:5px 0;text-align:right;font-weight:700">${_fmtBRL(totLiq)}</td>
+              </tr>
+              ${metaPct !== null ? `<tr style="border-top:1px solid #f3f4f6">
+                <td style="padding:5px 0;color:#374151;font-weight:500">Resultado</td>
+                <td style="padding:5px 0;text-align:right;font-size:12px">${varBadgeAbs(metaDif, metaPct)}</td>
+              </tr>` : ''}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('fech-output').style.display = '';
+}
+
+function exportarFechamentoPDF() {
+  const preview = document.getElementById('fech-preview');
+  const mes = document.getElementById('fech-mes').value.trim() || 'fechamento';
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+    <title>Fechamento ${mes}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;padding:32px;color:#111;background:#fff}@media print{body{padding:16px}}</style>
+    </head><body>${preview.innerHTML}<script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.close();
 }
 
 function gerarProjecoes() {
@@ -1600,6 +2307,7 @@ function gerarProjecoes() {
 
   document.getElementById('proj-texto').textContent = texto;
   document.getElementById('proj-output').style.display = '';
+  _saveManual('proj');
 }
 
 function gerarComparativo() {
@@ -1663,10 +2371,192 @@ function gerarComparativo() {
   const wpp = `📊 *Comparativo Real x Mês Anterior*\n\n📅 *Período 1 - ${p1i} a ${p1f}*\n${wppP1}\n━━━━━━━━━━━━━━━\n\n📅 *Período 2 - ${p2i} a ${p2f}*\n${wppP2}`;
   document.getElementById('comp-texto').textContent = wpp;
   document.getElementById('comp-output').style.display = '';
+  document.getElementById('analise-texto').textContent = gerarAnalise();
+  _saveManual('comp');
+}
+
+function gerarAnalise() {
+  // Lê dados do comparativo
+  let tf1 = 0, ti1 = 0, tf2 = 0, ti2 = 0;
+  const canaisComp = CANAIS.map(c => {
+    const f1 = parseBRL(document.getElementById(`comp-f1-${c.id}`).value);
+    const i1 = parseBRL(document.getElementById(`comp-i1-${c.id}`).value);
+    const f2 = parseBRL(document.getElementById(`comp-f2-${c.id}`).value);
+    const i2 = parseBRL(document.getElementById(`comp-i2-${c.id}`).value);
+    tf1 += f1; ti1 += i1; tf2 += f2; ti2 += i2;
+    return {
+      label: c.label, f1, f2,
+      acos1: f1 > 0 ? i1/f1*100 : 0, roas1: i1 > 0 ? f1/i1 : 0,
+      acos2: f2 > 0 ? i2/f2*100 : 0, roas2: i2 > 0 ? f2/i2 : 0,
+      var:   f1 > 0 ? (f2-f1)/f1*100 : 0,
+    };
+  });
+  const total = {
+    f1: tf1, f2: tf2,
+    acos2: tf2 > 0 ? ti2/tf2*100 : 0, roas2: ti2 > 0 ? tf2/ti2 : 0,
+    var:   tf1 > 0 ? (tf2-tf1)/tf1*100 : 0,
+  };
+
+  // Lê dados de projeção
+  const diasDec   = Number(document.getElementById('p-dias-dec').value)   || 1;
+  const diasTotal = Number(document.getElementById('p-dias-total').value) || 30;
+  const meta      = parseBRL(document.getElementById('p-meta').value);
+  const mes       = document.getElementById('p-mes-atual').value.trim();
+  let totalProj   = 0;
+  const canaisProj = CANAIS.map(c => {
+    const fat  = parseBRL(document.getElementById(`proj-fat-${c.id}`).value);
+    const ant  = parseBRL(document.getElementById(`proj-ant-${c.id}`).value);
+    const proj = diasDec > 0 ? fat / diasDec * diasTotal : 0;
+    totalProj += proj;
+    return { label: c.label, fat_proj: proj, var_pct: ant > 0 ? (proj-ant)/ant*100 : 0 };
+  });
+
+  // Helpers
+  const fK  = v => 'R$' + Math.round(v/1000).toLocaleString('pt-BR') + 'K';
+  const fV  = v => (v >= 0 ? '+' : '') + Math.abs(v).toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1}) + '%';
+  const f2  = v => v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const word= v => v > 1 ? 'subiu' : v < -1 ? 'caiu' : 'estável';
+  const aDir= (a1,a2) => a2 < a1-0.2 ? `caindo pra ${f2(a2)}%` : a2 > a1+0.2 ? `subindo pra ${f2(a2)}%` : `estável em ${f2(a2)}%`;
+
+  const cc  = label => canaisComp.find(c => c.label === label) || {};
+  const cp  = label => canaisProj.find(c => c.label === label) || {};
+
+  const sh2 = cc('Shopee 2 Freewall'), ml1 = cc('ML1 Freewall'), tik = cc('TikTok Shop');
+  const sh1 = cc('Shopee 1 GQ'),      ml2 = cc('ML2 GQ');
+
+  // ── Freewall ──
+  const fwBad  = [sh2, ml1, tik].filter(c => c.var < -5).length;
+  const fwIcon = fwBad === 0 ? '✅' : '🔴';
+  const fwText = `Freewall ${fwIcon} — `
+    + `Shopee2 ${word(sh2.var)} (${fV(sh2.var)}) com ACOS ${aDir(sh2.acos1, sh2.acos2)} e ROAS ${f2(sh2.roas2)}x. `
+    + `ML1 ${word(ml1.var)} (${fV(ml1.var)}), canal mais eficiente (ROAS ${f2(ml1.roas2)}x). `
+    + `TikTok ${word(tik.var)} (${fV(tik.var)}).`
+    + (fwBad === 0 ? ' Sem pontos negativos.' : '');
+
+  // ── GQ ──
+  const gqIcon = sh1.var < -10 ? '🔴' : sh1.var < 0 ? '⚠️' : '✅';
+  let sh1t;
+  if (sh1.var < -5) {
+    const proj1 = cp('Shopee 1 GQ');
+    const pNote = proj1.var_pct !== undefined
+      ? ` A projeção do mês espera ${fV(proj1.var_pct)}, o que exige recuperação no restante do período.` : '';
+    sh1t = `Shopee1 caiu ${fV(sh1.var)} (${fK(sh1.f1)}→${fK(sh1.f2)}) — queda real de faturamento, ACOS/ROAS estáveis.${pNote}`;
+  } else {
+    sh1t = `Shopee1 ${word(sh1.var)} (${fV(sh1.var)}) com ACOS ${f2(sh1.acos2)}% e ROAS ${f2(sh1.roas2)}x.`;
+  }
+  const ml2t = ml2.var > 200
+    ? `ML2 disparando (${fV(ml2.var)}), ACOS caindo de ${f2(ml2.acos1)}% para ${f2(ml2.acos2)}%.`
+    : `ML2 ${word(ml2.var)} (${fV(ml2.var)}) com ACOS ${f2(ml2.acos2)}% e ROAS ${f2(ml2.roas2)}x.`;
+  const gqText = `GQ ${gqIcon} — ${sh1t} ${ml2t}`;
+
+  // ── Geral ──
+  const diffPct  = meta > 0 ? (totalProj - meta) / meta * 100 : 0;
+  const metaDir  = totalProj >= meta ? 'acima' : 'abaixo';
+  const metaNote = (sh1.var < -5 && totalProj >= meta)
+    ? ' — mas depende de GQ reverter o Shopee1.' : '';
+  const fM = v => v >= 1e6
+    ? 'R$' + (v/1e6).toLocaleString('pt-BR', {minimumFractionDigits:3, maximumFractionDigits:3}) + 'M'
+    : fK(v);
+  const geralText = `Geral: Faturamento ${fV(total.var)} (${fK(total.f1)}→${fK(total.f2)}), ACOS ${f2(total.acos2)}%, ROAS ${f2(total.roas2)}x. `
+    + `Projeção de ${mes} (${fM(totalProj)}) fica ${Math.abs(diffPct).toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1})}% ${metaDir} da meta (${fM(meta)})${metaNote}`;
+
+  return [fwText, gqText, geralText].join('\n\n');
 }
 
 function copiarTexto(id) {
   navigator.clipboard.writeText(document.getElementById(id).textContent);
+}
+
+async function exportarPDFUnificado(btn) {
+  const hoje = new Date();
+  const mm = d => String(d.getMonth() + 1).padStart(2,'0');
+  const dd = d => String(d.getDate()).padStart(2,'0');
+  const exportado = dd(hoje) + '/' + mm(hoje) + '/' + hoje.getFullYear();
+
+  // ── Coleta dados de Projeções ──────────────────────────────────────────────
+  const mesAtual   = document.getElementById('p-mes-atual').value.trim();
+  const diasDec    = Number(document.getElementById('p-dias-dec').value) || 1;
+  const diasTotal  = Number(document.getElementById('p-dias-total').value) || 30;
+  const meta       = parseBRL(document.getElementById('p-meta').value);
+  const metaMes    = document.getElementById('p-meta-mes').value.trim();
+  const periodoP   = '01/' + mm(hoje) + ' a ' + String(diasDec).padStart(2,'0') + '/' + mm(hoje);
+
+  let totalProj = 0;
+  const canaisProj = CANAIS.map(c => {
+    const fat = parseBRL(document.getElementById(`proj-fat-${c.id}`).value);
+    const ant = parseBRL(document.getElementById(`proj-ant-${c.id}`).value);
+    const proj = diasDec > 0 ? fat / diasDec * diasTotal : 0;
+    const varPct = ant > 0 ? (proj - ant) / ant * 100 : 0;
+    totalProj += proj;
+    return { label: c.label, fat_proj: proj, var_pct: varPct };
+  });
+
+  // ── Coleta dados de Comparativo ────────────────────────────────────────────
+  const p1i = document.getElementById('c-p1-inicio').value.trim();
+  const p1f = document.getElementById('c-p1-fim').value.trim();
+  const p2i = document.getElementById('c-p2-inicio').value.trim();
+  const p2f = document.getElementById('c-p2-fim').value.trim();
+
+  let tf1 = 0, ti1 = 0, tf2 = 0, ti2 = 0;
+  const canaisComp = CANAIS.map(c => {
+    const f1 = parseBRL(document.getElementById(`comp-f1-${c.id}`).value);
+    const i1 = parseBRL(document.getElementById(`comp-i1-${c.id}`).value);
+    const f2 = parseBRL(document.getElementById(`comp-f2-${c.id}`).value);
+    const i2 = parseBRL(document.getElementById(`comp-i2-${c.id}`).value);
+    tf1 += f1; ti1 += i1; tf2 += f2; ti2 += i2;
+    return {
+      label: c.label,
+      f1, acos1: f1 > 0 ? i1/f1*100 : 0, roas1: i1 > 0 ? f1/i1 : 0,
+      f2, acos2: f2 > 0 ? i2/f2*100 : 0, roas2: i2 > 0 ? f2/i2 : 0,
+      var: f1 > 0 ? (f2 - f1) / f1 * 100 : 0,
+    };
+  });
+
+  const payload = {
+    exportado_em: exportado,
+    proj: {
+      mes: mesAtual, periodo: periodoP,
+      dias_dec: diasDec, dias_total: diasTotal,
+      meta, meta_mes: metaMes,
+      canais: canaisProj, total_proj: totalProj,
+    },
+    comp: {
+      p1: p1i + ' a ' + p1f,
+      p2: p2i + ' a ' + p2f,
+      canais: canaisComp,
+      total: {
+        f1: tf1, acos1: tf1 > 0 ? ti1/tf1*100 : 0, roas1: ti1 > 0 ? tf1/ti1 : 0,
+        f2: tf2, acos2: tf2 > 0 ? ti2/tf2*100 : 0, roas2: ti2 > 0 ? tf2/ti2 : 0,
+        var: tf1 > 0 ? (tf2 - tf1) / tf1 * 100 : 0,
+      },
+    },
+    analise: document.getElementById('analise-texto').textContent || '',
+  };
+
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Gerando...';
+
+  try {
+    const res = await fetch('/api/relatorio-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Erro'); }
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = 'relatorio_marketplaces_' + exportado.replace(/\//g, '') + '.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert('Erro ao gerar PDF: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+  }
 }
 
 function exportarComparativoPDF() {
@@ -1809,138 +2699,6 @@ function calc() {
 
   document.getElementById('calc-empty').style.display = 'none';
   document.getElementById('result-content').style.display = 'block';
-}
-
-// ── Medidas e Peso – busca individual ───────────────────────────────────────
-function getMedidasAccount() {
-  return document.getElementById('medidas-account').value || Object.keys({{accounts|tojson}})[0];
-}
-
-function loadSingleItem() {
-  const id = document.getElementById('single-item-id').value.trim().toUpperCase();
-  if (!id) return;
-  const account = getMedidasAccount();
-  if (!account) { alert('Selecione uma conta primeiro.'); return; }
-  document.getElementById('single-status').textContent = 'Buscando...';
-  document.getElementById('single-item-result').style.display = 'none';
-  fetch(`/api/items/${account}/single/${id}`)
-    .then(r => r.json())
-    .then(data => {
-      if (data.error) { document.getElementById('single-status').textContent = data.error; return; }
-      document.getElementById('single-thumb').src = data.thumbnail || '';
-      document.getElementById('single-title').textContent = data.title;
-      document.getElementById('single-dims').textContent = 'Atual: ' + (data.dimensions || '—');
-      document.getElementById('single-new-dims').value = data.dimensions || '';
-      document.getElementById('single-item-result').style.display = 'flex';
-      document.getElementById('single-status').textContent = '';
-    })
-    .catch(() => { document.getElementById('single-status').textContent = 'Erro ao buscar'; });
-}
-
-function saveSingleItem() {
-  const id = document.getElementById('single-item-id').value.trim().toUpperCase();
-  const dims = document.getElementById('single-new-dims').value.trim();
-  const account = getMedidasAccount();
-  if (!id || !dims || !account) return;
-  document.getElementById('single-status').textContent = 'Salvando...';
-  fetch(`/api/items/${account}/update`, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify([{item_id: id, dimensions: dims}])
-  })
-    .then(r => r.json())
-    .then(results => {
-      const r = results[0] || {};
-      if (r.ok) {
-        document.getElementById('single-dims').textContent = 'Atual: ' + dims;
-        document.getElementById('single-status').textContent = '✓ Salvo com sucesso';
-      } else {
-        document.getElementById('single-status').textContent = `Erro (status ${r.status})`;
-      }
-    })
-    .catch(() => { document.getElementById('single-status').textContent = 'Erro ao salvar'; });
-}
-
-// ── Medidas e Peso ──────────────────────────────────────────────────────────
-let medidaItems = [];
-let medidaEdits = {};
-
-function loadMedidas() {
-  const account = document.getElementById('medidas-account').value;
-  if (!account) return;
-  const btn = document.getElementById('btn-importar-anuncios');
-  btn.textContent = 'Importando...';
-  btn.disabled = true;
-  document.getElementById('medidas-status').textContent = '';
-  document.getElementById('medidas-table-wrap').style.display = 'none';
-  fetch(`/api/items/${account}`)
-    .then(r => r.json())
-    .then(data => {
-      medidaItems = data.items || [];
-      medidaEdits = {};
-      renderMedidasTable();
-      document.getElementById('medidas-table-wrap').style.display = 'block';
-      document.getElementById('medidas-status').textContent = `${medidaItems.length} anúncios carregados`;
-    })
-    .catch(() => { document.getElementById('medidas-status').textContent = 'Erro ao carregar'; })
-    .finally(() => { btn.textContent = 'Importar anúncios'; btn.disabled = false; });
-}
-
-function renderMedidasTable() {
-  const q = (document.getElementById('medidas-search') || {value:''}).value.toLowerCase();
-  const rows = medidaItems.filter(it => !q || it.title.toLowerCase().includes(q) || it.id.toLowerCase().includes(q));
-  let html = `<table class="data-table">
-    <thead><tr>
-      <th style="width:48px"></th>
-      <th>Título</th>
-      <th style="width:120px">ID</th>
-      <th style="width:200px">Dimensões atuais</th>
-      <th style="width:220px">Novas dimensões <span style="font-weight:400;font-size:10px">(AltxLargxComp,PesoGr)</span></th>
-    </tr></thead><tbody>`;
-  rows.forEach(it => {
-    const edited = medidaEdits[it.id] !== undefined;
-    html += `<tr style="${edited ? 'background:var(--amber-subtle, rgba(251,191,36,0.07))' : ''}">
-      <td><img src="${it.thumbnail}" style="width:40px;height:40px;object-fit:cover;border-radius:4px" onerror="this.style.display='none'"></td>
-      <td style="font-size:12px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${it.title}">${it.title}</td>
-      <td><span class="mono" style="font-size:11px">${it.id}</span></td>
-      <td><span class="mono" style="font-size:11px;color:var(--muted)">${it.dimensions || '—'}</span></td>
-      <td><input type="text" value="${medidaEdits[it.id] || ''}" placeholder="${it.dimensions || 'ex: 12x50x70,3000'}"
-        oninput="medidaEdits['${it.id}'] = this.value; this.closest('tr').style.background = this.value ? 'var(--amber-subtle, rgba(251,191,36,0.07))' : ''"
-        style="width:100%;height:30px;padding:0 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-family:var(--font-mono);font-size:11px">
-      </td>
-    </tr>`;
-  });
-  html += '</tbody></table>';
-  document.getElementById('medidas-table').innerHTML = html;
-  document.getElementById('medidas-count').textContent = `${rows.length} de ${medidaItems.length}`;
-}
-
-function salvarMedidas() {
-  const account = document.getElementById('medidas-account').value;
-  const updates = Object.entries(medidaEdits)
-    .filter(([,v]) => v.trim())
-    .map(([item_id, dimensions]) => ({item_id, dimensions: dimensions.trim()}));
-  if (!updates.length) { alert('Nenhuma alteração para salvar.'); return; }
-  const btn = document.getElementById('btn-salvar-medidas');
-  btn.textContent = `Salvando ${updates.length} itens...`;
-  btn.disabled = true;
-  fetch(`/api/items/${account}/update`, {
-    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(updates)
-  })
-    .then(r => r.json())
-    .then(results => {
-      const ok = results.filter(r => r.ok).length;
-      const fail = results.filter(r => !r.ok).length;
-      // Atualiza dimensões na lista local
-      results.filter(r => r.ok).forEach(r => {
-        const item = medidaItems.find(it => it.id === r.item_id);
-        if (item) { item.dimensions = medidaEdits[r.item_id]; delete medidaEdits[r.item_id]; }
-      });
-      renderMedidasTable();
-      document.getElementById('medidas-status').textContent =
-        `✓ ${ok} atualizados com sucesso` + (fail ? ` · ${fail} falharam` : '');
-    })
-    .catch(() => { document.getElementById('medidas-status').textContent = 'Erro ao salvar'; })
-    .finally(() => { btn.textContent = 'Salvar alterações'; btn.disabled = false; });
 }
 
 // ===== GERADOR DE TÍTULOS =====

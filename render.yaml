@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: goquadros-dashboard
+    env: node
+    rootDir: backend
+    buildCommand: cd ../frontend && npm install && npm run build && cd ../backend && npm install
+    startCommand: node src/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: goquadros-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ML_CLIENT_ID
+        value: 20654605322603
+      - key: ML_CLIENT_SECRET
+        sync: false
+      - key: ML_REDIRECT_URI
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+databases:
+  - name: goquadros-db
+    plan: free
+    databaseName: goquadros
+    user: goquadros

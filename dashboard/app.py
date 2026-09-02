@@ -6,7 +6,7 @@ import requests
 import concurrent.futures
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import Flask, redirect, request, session, render_template, jsonify, url_for
+from flask import Flask, redirect, request, session, render_template, jsonify, url_for, send_file
 
 from dotenv import load_dotenv
 
@@ -24,6 +24,8 @@ TOKENS_FILE = os.path.join(DATA_DIR, "tokens.json")
 USERS_FILE = os.path.join(DATA_DIR, "users.json")
 CLIPS_FILE = os.path.join(DATA_DIR, "clips.json")
 KEYWORDS_FILE = os.path.join(DATA_DIR, "keywords.json")
+ADS_CONFIG_FILE = os.path.join(DATA_DIR, "ads_config.json")
+SALES_HISTORY_FILE = os.path.join(DATA_DIR, "sales_history.json")
 
 ACCOUNTS = {
     "freewall": {
@@ -582,113 +584,6 @@ def list_clips():
     return jsonify(list(load_clips()))
 
 
-@app.route("/api/items/<account_key>")
-@master_required
-def list_items(account_key):
-    """Lista todos os anúncios ativos de uma conta ML com dimensões e peso."""
-    acc = ACCOUNTS.get(account_key)
-    if not acc or acc.get("platform") != "ml" or not acc.get("seller_id"):
-        return jsonify({"error": "Conta ML não conectada"}), 400
-    seller_id = acc["seller_id"]
-    # Busca todos os IDs de itens ativos
-    all_ids = []
-    offset = 0
-    while True:
-        data = ml_get(account_key, f"/users/{seller_id}/items/search", params={
-            "status": "active", "limit": 100, "offset": offset
-        })
-        if not data or not data.get("results"):
-            break
-        all_ids.extend(data["results"])
-        if offset + 100 >= data.get("paging", {}).get("total", 0):
-            break
-        offset += 100
-    # Busca detalhes em lotes de 20
-    items = []
-    for i in range(0, len(all_ids), 20):
-        batch = all_ids[i:i+20]
-        details = ml_get(account_key, "/items", params={"ids": ",".join(batch)})
-        if isinstance(details, list):
-            for entry in details:
-                body = entry.get("body") or {}
-                if not body.get("id"):
-                    continue
-                pkg = {a["id"]: a.get("value_name","") for a in body.get("attributes",[]) if "SELLER_PACKAGE" in a.get("id","")}
-                h = pkg.get("SELLER_PACKAGE_HEIGHT","")
-                w = pkg.get("SELLER_PACKAGE_WIDTH","")
-                l = pkg.get("SELLER_PACKAGE_LENGTH","")
-                p = pkg.get("SELLER_PACKAGE_WEIGHT","")
-                dims = f"{h}x{w}x{l},{p}" if h or w or l or p else ""
-                items.append({
-                    "id": body["id"],
-                    "title": body.get("title", ""),
-                    "thumbnail": body.get("thumbnail", ""),
-                    "status": body.get("status", ""),
-                    "dimensions": dims,
-                })
-    return jsonify({"total": len(items), "items": items})
-
-@app.route("/api/items/<account_key>/single/<item_id>")
-@master_required
-def get_single_item(account_key, item_id):
-    """Busca dimensões de um único item ML."""
-    acc = ACCOUNTS.get(account_key)
-    if not acc or acc.get("platform") != "ml" or not acc.get("token"):
-        return jsonify({"error": "Conta ML não conectada"}), 400
-    data = ml_get(account_key, f"/items/{item_id}")
-    if not data:
-        return jsonify({"error": "Item não encontrado"}), 404
-    pkg = {a["id"]: a.get("value_name","") for a in data.get("attributes",[]) if "SELLER_PACKAGE" in a.get("id","")}
-    h = pkg.get("SELLER_PACKAGE_HEIGHT","")
-    w = pkg.get("SELLER_PACKAGE_WIDTH","")
-    l = pkg.get("SELLER_PACKAGE_LENGTH","")
-    p = pkg.get("SELLER_PACKAGE_WEIGHT","")
-    dims = f"{h}x{w}x{l},{p}" if h or w or l or p else ""
-    return jsonify({
-        "id": data.get("id"),
-        "title": data.get("title", ""),
-        "thumbnail": data.get("thumbnail", ""),
-        "status": data.get("status", ""),
-        "dimensions": dims,
-    })
-
-@app.route("/api/items/<account_key>/update", methods=["POST"])
-@master_required
-def update_items(account_key):
-    """Atualiza dimensões/peso de uma lista de itens ML."""
-    acc = ACCOUNTS.get(account_key)
-    if not acc or acc.get("platform") != "ml" or not acc.get("token"):
-        return jsonify({"error": "Conta ML não conectada"}), 400
-    updates = request.json or []  # [{item_id, dimensions}]
-    results = []
-    headers = {"Authorization": f"Bearer {acc['token']}", "Content-Type": "application/json"}
-    for upd in updates:
-        item_id = upd.get("item_id")
-        dims = upd.get("dimensions", "").strip()
-        if not item_id or not dims:
-            continue
-        attrs = None
-        try:
-            dim_part, peso_part = dims.split(",")
-            h, w, l = dim_part.strip().split("x")
-            attrs = [
-                {"id": "SELLER_PACKAGE_HEIGHT", "value_name": f"{h.strip()} cm"},
-                {"id": "SELLER_PACKAGE_WIDTH",  "value_name": f"{w.strip()} cm"},
-                {"id": "SELLER_PACKAGE_LENGTH", "value_name": f"{l.strip()} cm"},
-                {"id": "SELLER_PACKAGE_WEIGHT", "value_name": f"{peso_part.strip()} g"},
-            ]
-        except Exception:
-            pass
-        body = {"attributes": attrs} if attrs else {}
-        r = requests.put(
-            f"https://api.mercadolibre.com/items/{item_id}",
-            headers=headers,
-            json=body,
-            timeout=10,
-        )
-        results.append({"item_id": item_id, "status": r.status_code, "ok": r.status_code == 200})
-    return jsonify(results)
-
 @app.route("/api/debug/shipment/<account_key>")
 @master_required
 def debug_shipment(account_key):
@@ -1036,6 +931,463 @@ def titulos_existentes():
                 break
             offset += 100
     return jsonify(existentes)
+
+
+def _build_relatorio_pdf(payload):
+    from io import BytesIO
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors as rl_colors
+    from reportlab.lib.units import cm
+    from reportlab.platypus import (
+        SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+    )
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+
+    GRAY_HDR = rl_colors.HexColor('#EFEFEF')
+    GRAY_TOT = rl_colors.HexColor('#E0E0E0')
+    GRID     = rl_colors.HexColor('#BBBBBB')
+    BLACK    = rl_colors.HexColor('#000000')
+    DARK     = rl_colors.HexColor('#1C1C1C')
+    GRAY     = rl_colors.HexColor('#666666')
+    WHITE    = rl_colors.white
+
+    PAGE_W, PAGE_H = A4
+    MAR   = 1.8 * cm
+    AVAIL = PAGE_W - 2 * MAR
+
+    def brl(v):
+        s = f"{float(v):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        return f"R$ {s}"
+
+    def pct(v, sign=True):
+        v = float(v)
+        s = f"{abs(v):.1f}".replace(".", ",") + "%"
+        return ("+" if (sign and v >= 0) else ("-" if v < 0 else "")) + s
+
+    def dec(v, places=2):
+        return f"{float(v):.{places}f}".replace(".", ",")
+
+    def ps(fn="Helvetica", fs=9, tc=DARK, align=TA_LEFT, leading=None):
+        return ParagraphStyle('_', fontName=fn, fontSize=fs, textColor=tc,
+                              alignment=align, leading=leading or fs * 1.3)
+
+    def P(txt, **kw):
+        return Paragraph(str(txt), ps(**kw))
+
+    PAD = [
+        ('TOPPADDING',    (0,0), (-1,-1), 5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 5),
+        ('LEFTPADDING',   (0,0), (-1,-1), 6),
+        ('RIGHTPADDING',  (0,0), (-1,-1), 6),
+        ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+    ]
+
+    story = []
+    exportado = payload.get("exportado_em", datetime.now().strftime("%d/%m/%Y"))
+    proj_data = payload.get("proj", {})
+    comp_data = payload.get("comp", {})
+
+    # ── Cabeçalho ─────────────────────────────────────────────────────────────
+    story.append(P("Projeções e Comparativo Real", fn='Helvetica-Bold', fs=16, tc=BLACK))
+    story.append(Spacer(1, 3))
+    story.append(P(f"Go Quadros — Marketplaces — Exportado em {exportado}", tc=GRAY, fs=9))
+    story.append(Spacer(1, 14))
+    story.append(HRFlowable(width="100%", thickness=0.8, color=BLACK))
+    story.append(Spacer(1, 14))
+
+    # ── Projeções ─────────────────────────────────────────────────────────────
+    mes       = proj_data.get("mes", "")
+    periodo   = proj_data.get("periodo", "")
+    dias_dec  = int(proj_data.get("dias_dec", 1))
+    dias_tot  = int(proj_data.get("dias_total", 30))
+    meta      = float(proj_data.get("meta", 0))
+    meta_mes  = proj_data.get("meta_mes", "")
+    canais_p  = proj_data.get("canais", [])
+    total_p   = float(proj_data.get("total_proj", 0))
+    diff      = total_p - meta
+    diff_pct  = (diff / meta * 100) if meta else 0
+
+    story.append(P(f"Projeções Mensais — {mes}/{exportado[-4:]}", fn='Helvetica-Bold', fs=11, tc=BLACK))
+    story.append(Spacer(1, 2))
+    story.append(P(f"Período registrado: {periodo} ({dias_dec} dias de {dias_tot})", tc=GRAY, fs=8))
+    story.append(Spacer(1, 8))
+
+    cw1 = [6.5*cm, 6.0*cm, AVAIL - 6.5*cm - 6.0*cm]
+    H = dict(fn='Helvetica-Bold', fs=9, tc=BLACK)
+    rows1 = [[
+        P("Canal",                 **H, align=TA_LEFT),
+        P("Faturamento Projetado", **H, align=TA_RIGHT),
+        P("Var. vs Mês Anterior",  **H, align=TA_CENTER),
+    ]]
+    for c in canais_p:
+        rows1.append([
+            P(c["label"],          align=TA_LEFT),
+            P(brl(c["fat_proj"]),  align=TA_RIGHT),
+            P(pct(c["var_pct"]),   align=TA_CENTER),
+        ])
+    rows1.append([
+        P("Meta Mínima Líquida — " + meta_mes, **H, align=TA_LEFT),
+        P(brl(meta),                            **H, align=TA_RIGHT),
+        P("",                                   align=TA_CENTER),
+    ])
+    rows1.append([
+        P("TOTAL",                         **H, align=TA_LEFT),
+        P(brl(total_p),                    **H, align=TA_RIGHT),
+        P(pct(diff_pct) + " vs meta",      **H, align=TA_CENTER),
+    ])
+    t1 = Table(rows1, colWidths=cw1)
+    t1.setStyle(TableStyle(PAD + [
+        ('GRID',       (0,0),  (-1,-1), 0.5, GRID),
+        ('BACKGROUND', (0,0),  (-1, 0), GRAY_HDR),
+        ('BACKGROUND', (0,-2), (-1,-2), GRAY_HDR),
+        ('BACKGROUND', (0,-1), (-1,-1), GRAY_TOT),
+        ('LINEABOVE',  (0,-1), (-1,-1), 1.0, BLACK),
+    ]))
+    story.append(t1)
+    story.append(Spacer(1, 22))
+    story.append(HRFlowable(width="100%", thickness=0.5, color=GRID))
+    story.append(Spacer(1, 14))
+
+    # ── Comparativo ───────────────────────────────────────────────────────────
+    p1_label  = comp_data.get("p1", "")
+    p2_label  = comp_data.get("p2", "")
+    canais_c  = comp_data.get("canais", [])
+    total_c   = comp_data.get("total", {})
+
+    story.append(P("Comparativo Real x Mês Anterior", fn='Helvetica-Bold', fs=11, tc=BLACK))
+    story.append(Spacer(1, 2))
+    story.append(P(f"Período {p1_label}  vs  {p2_label}", tc=GRAY, fs=8))
+    story.append(Spacer(1, 8))
+
+    cw2 = [3.6*cm, 2.5*cm, 1.6*cm, 1.6*cm, 0.6*cm, 2.5*cm, 1.6*cm, 1.6*cm, 2.2*cm]
+    HC = dict(fn='Helvetica-Bold', fs=8, tc=BLACK, align=TA_CENTER)
+    hdr2 = [
+        P("Canal",    **{**HC, 'align': TA_LEFT}),
+        P("Fat. " + p1_label.split(" a ")[0][:5] if p1_label else "Fat. P1", **HC),
+        P("ACOS",     **HC), P("ROAS",     **HC), P("",         **HC),
+        P("Fat. " + p2_label.split(" a ")[0][:5] if p2_label else "Fat. P2", **HC),
+        P("ACOS",     **HC), P("ROAS",     **HC), P("Var. Fat.", **HC),
+    ]
+    rows2 = [hdr2]
+    for c in canais_c:
+        rows2.append([
+            P(c["label"],        align=TA_LEFT,   fs=9),
+            P(brl(c["f1"]),      align=TA_RIGHT,  fs=9),
+            P(dec(c["acos1"])+"%", align=TA_CENTER, fs=9),
+            P(dec(c["roas1"])+"x", align=TA_CENTER, fs=9),
+            P("→",               align=TA_CENTER, fs=9, tc=GRAY),
+            P(brl(c["f2"]),      align=TA_RIGHT,  fs=9),
+            P(dec(c["acos2"])+"%", align=TA_CENTER, fs=9),
+            P(dec(c["roas2"])+"x", align=TA_CENTER, fs=9),
+            P(pct(c["var"]),     align=TA_CENTER, fs=9),
+        ])
+    if total_c:
+        rows2.append([
+            P("TOTAL",                    fn='Helvetica-Bold', fs=9, tc=BLACK, align=TA_LEFT),
+            P(brl(total_c["f1"]),         fn='Helvetica-Bold', fs=9, tc=BLACK, align=TA_RIGHT),
+            P(dec(total_c["acos1"])+"%",  fn='Helvetica-Bold', fs=9, tc=BLACK, align=TA_CENTER),
+            P(dec(total_c["roas1"])+"x",  fn='Helvetica-Bold', fs=9, tc=BLACK, align=TA_CENTER),
+            P("→",                        fn='Helvetica-Bold', fs=9, tc=GRAY,  align=TA_CENTER),
+            P(brl(total_c["f2"]),         fn='Helvetica-Bold', fs=9, tc=BLACK, align=TA_RIGHT),
+            P(dec(total_c["acos2"])+"%",  fn='Helvetica-Bold', fs=9, tc=BLACK, align=TA_CENTER),
+            P(dec(total_c["roas2"])+"x",  fn='Helvetica-Bold', fs=9, tc=BLACK, align=TA_CENTER),
+            P(pct(total_c["var"]),        fn='Helvetica-Bold', fs=9, tc=BLACK, align=TA_CENTER),
+        ])
+    t2 = Table(rows2, colWidths=cw2)
+    t2.setStyle(TableStyle(PAD + [
+        ('GRID',       (0,0),  (-1,-1), 0.5, GRID),
+        ('BACKGROUND', (0,0),  (-1, 0), GRAY_HDR),
+        ('BACKGROUND', (0,-1), (-1,-1), GRAY_TOT),
+        ('LINEABOVE',  (0,-1), (-1,-1), 1.0, BLACK),
+        ('LINEAFTER',  (3,0),  (3,-1),  1.0, BLACK),
+        ('LINEBEFORE', (5,0),  (5,-1),  1.0, BLACK),
+    ]))
+    story.append(t2)
+
+    # ── Análise ───────────────────────────────────────────────────────────────
+    analise_raw = payload.get("analise", "").strip()
+    if analise_raw:
+        import re
+        analise_clean = re.sub(r'[^\x00-\xFF]', '', analise_raw).strip()
+        story.append(Spacer(1, 16))
+        story.append(HRFlowable(width="100%", thickness=0.5, color=GRID))
+        story.append(Spacer(1, 12))
+        story.append(P("Análise", fn='Helvetica-Bold', fs=11, tc=BLACK))
+        story.append(Spacer(1, 8))
+        for bloco in analise_clean.split('\n\n'):
+            bloco = bloco.strip()
+            if bloco:
+                story.append(P(bloco, tc=DARK, fs=9, leading=14))
+                story.append(Spacer(1, 6))
+
+    # ── Rodapé ────────────────────────────────────────────────────────────────
+    story.append(Spacer(1, 12))
+    story.append(HRFlowable(width="100%", thickness=0.5, color=GRID))
+    story.append(Spacer(1, 4))
+    story.append(P(f"Go Quadros — Relatório interno de marketplaces  ·  Gerado em {exportado}",
+                   tc=GRAY, fs=7, align=TA_CENTER))
+
+    buf = BytesIO()
+    doc = SimpleDocTemplate(
+        buf, pagesize=A4,
+        leftMargin=MAR, rightMargin=MAR,
+        topMargin=MAR, bottomMargin=MAR,
+        title="Relatório Marketplaces — Go Quadros",
+        author="Go Quadros",
+    )
+    doc.build(story)
+    buf.seek(0)
+    return buf
+
+
+@app.route("/api/relatorio-pdf", methods=["POST"])
+@login_required
+def relatorio_pdf():
+    try:
+        payload = request.get_json(force=True)
+        buf = _build_relatorio_pdf(payload)
+        nome = "relatorio_marketplaces_" + datetime.now().strftime("%d%m%Y") + ".pdf"
+        return send_file(buf, mimetype="application/pdf",
+                         as_attachment=True, download_name=nome)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ── Ads Gap ────────────────────────────────────────────────────────────────
+
+def load_ads_config():
+    if os.path.exists(ADS_CONFIG_FILE):
+        with open(ADS_CONFIG_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+def save_ads_config(cfg):
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(ADS_CONFIG_FILE, "w", encoding="utf-8") as f:
+        json.dump(cfg, f, ensure_ascii=False, indent=2)
+
+def _get_campaign_items_api(account_key, campaign_ids):
+    """Tenta buscar itens de campanha via ML API. Retorna (set_ids, api_ok)."""
+    acc = ACCOUNTS[account_key]
+    if not acc.get("token"):
+        return set(), False
+    items = set()
+    for camp_id in campaign_ids:
+        headers = {"Authorization": f"Bearer {acc['token']}"}
+        r = requests.get(
+            f"https://api.mercadolibre.com/advertising/product_ads/campaigns/{camp_id}/ad_items",
+            headers=headers, params={"limit": 100}, timeout=10
+        )
+        if r.status_code == 401 and refresh_token(account_key):
+            headers = {"Authorization": f"Bearer {ACCOUNTS[account_key]['token']}"}
+            r = requests.get(
+                f"https://api.mercadolibre.com/advertising/product_ads/campaigns/{camp_id}/ad_items",
+                headers=headers, params={"limit": 100}, timeout=10
+            )
+        if r.status_code != 200:
+            return items, False  # 403 ou outro erro → modo manual
+        data = r.json()
+        results = data if isinstance(data, list) else data.get("results", [])
+        for it in results:
+            iid = it.get("item_id") or it.get("id")
+            if iid:
+                items.add(str(iid))
+    return items, True
+
+def _get_ml_items_with_sales(account_key, max_items=1000):
+    """Retorna lista de itens com sold_quantity > 0, ordenados desc."""
+    seller_id = ACCOUNTS[account_key].get("seller_id")
+    if not seller_id:
+        return []
+    all_ids = []
+    offset = 0
+    while offset < max_items:
+        data = ml_get(account_key, f"/users/{seller_id}/items/search",
+                      params={"limit": 100, "offset": offset})
+        if not data:
+            break
+        ids = data.get("results", [])
+        all_ids.extend(ids)
+        total = data.get("paging", {}).get("total", 0)
+        if len(all_ids) >= min(total, max_items) or not ids:
+            break
+        offset += 100
+    items = []
+    for i in range(0, len(all_ids), 20):
+        batch = all_ids[i:i+20]
+        data = ml_get(account_key, "/items", params={"ids": ",".join(batch)})
+        if data:
+            for entry in data:
+                body = entry.get("body", {})
+                if entry.get("code") == 200 and body.get("sold_quantity", 0) > 0:
+                    items.append({
+                        "id": body["id"],
+                        "titulo": body.get("title", ""),
+                        "vendidos": body["sold_quantity"],
+                        "preco": body.get("price", 0),
+                    })
+    return sorted(items, key=lambda x: x["vendidos"], reverse=True)
+
+@app.route("/api/ads-gap/<account_key>")
+@login_required
+def ads_gap(account_key):
+    if account_key not in ACCOUNTS:
+        return jsonify({"error": "Conta não encontrada"}), 404
+    cfg = load_ads_config()
+    acc_cfg = cfg.get(account_key, {})
+    campaign_ids = [c["id"] for c in acc_cfg.get("campaigns", [])]
+
+    # Tenta API; se 403 usa lista manual
+    ad_items, api_ok = _get_campaign_items_api(account_key, campaign_ids)
+    if not api_ok:
+        ad_items = set(str(i) for i in acc_cfg.get("manual_ad_items", []))
+
+    items_with_sales = _get_ml_items_with_sales(account_key)
+    not_in_ads = [it for it in items_with_sales if it["id"] not in ad_items]
+    in_ads     = [it for it in items_with_sales if it["id"] in ad_items]
+
+    ts = datetime.now().isoformat()
+    if account_key not in cfg:
+        cfg[account_key] = {}
+    cfg[account_key]["last_updated"] = ts
+    cfg[account_key]["cached_gap"] = not_in_ads
+    save_ads_config(cfg)
+
+    return jsonify({
+        "api_mode": api_ok,
+        "total_com_vendas": len(items_with_sales),
+        "em_campanhas": len(in_ads),
+        "fora_de_campanhas": len(not_in_ads),
+        "gap": not_in_ads,
+        "timestamp": ts,
+    })
+
+@app.route("/api/ads-config/<account_key>", methods=["GET"])
+@login_required
+def get_ads_config_route(account_key):
+    cfg = load_ads_config()
+    return jsonify(cfg.get(account_key, {}))
+
+@app.route("/api/ads-config/<account_key>/items", methods=["POST"])
+@login_required
+def update_ads_items(account_key):
+    """Atualiza lista manual de itens em Product Ads (MLB IDs colados pelo usuário)."""
+    data = request.get_json(force=True)
+    raw = data.get("items", [])
+    items = [s.strip() for s in raw if str(s).strip()]
+    cfg = load_ads_config()
+    if account_key not in cfg:
+        cfg[account_key] = {}
+    cfg[account_key]["manual_ad_items"] = items
+    cfg[account_key]["manual_updated"] = datetime.now().isoformat()
+    save_ads_config(cfg)
+    return jsonify({"ok": True, "count": len(items)})
+
+
+# ── Sales History ─────────────────────────────────────────────────────────────
+
+# Mapeia account_key → canal_id usado no JS (CANAIS)
+ML_CANAL_MAP = {
+    "freewall": "ml1",
+    "nova_gq":  "ml2",
+}
+
+def load_sales_history():
+    if os.path.exists(SALES_HISTORY_FILE):
+        with open(SALES_HISTORY_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    return {"period_cache": {}, "manual_last": {}}
+
+def save_sales_history(h):
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(SALES_HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(h, f, ensure_ascii=False, indent=2)
+
+def _fetch_ml_period_total(account_key, date_from, date_to):
+    """Soma total_amount de todos os pedidos pagos no período. Retorna float."""
+    seller_id = ACCOUNTS[account_key].get("seller_id")
+    if not seller_id:
+        return None
+    total = 0.0
+    offset = 0
+    while True:
+        data = ml_get(account_key, "/orders/search", params={
+            "seller": seller_id,
+            "order.status": "paid",
+            "order.date_created.from": f"{date_from}T00:00:00.000-0300",
+            "order.date_created.to":   f"{date_to}T23:59:59.000-0300",
+            "limit": 50,
+            "offset": offset,
+        })
+        if not data:
+            break
+        results = data.get("results", [])
+        for order in results:
+            total += float(order.get("total_amount", 0) or 0)
+        paging = data.get("paging", {})
+        offset += len(results)
+        if offset >= paging.get("total", 0) or not results:
+            break
+    return total
+
+@app.route("/api/sales/collect")
+@login_required
+def sales_collect():
+    """Busca faturamento ML bruto de ambas as contas para o período informado."""
+    date_from = request.args.get("from", "")
+    date_to   = request.args.get("to", "")
+    force     = request.args.get("force", "0") == "1"
+    if not date_from or not date_to:
+        return jsonify({"error": "Parâmetros 'from' e 'to' obrigatórios (YYYY-MM-DD)"}), 400
+
+    period_key = f"{date_from}_{date_to}"
+    history = load_sales_history()
+    pc = history.setdefault("period_cache", {})
+    results = {}
+
+    for account_key, canal_id in ML_CANAL_MAP.items():
+        if account_key not in ACCOUNTS:
+            continue
+        cached = pc.get(account_key, {}).get(period_key)
+        # Usa cache se tiver e não for forçado, e tiver menos de 6h
+        if cached and not force:
+            age_h = (datetime.now() - datetime.fromisoformat(cached["fetched_at"])).total_seconds() / 3600
+            if age_h < 6:
+                results[canal_id] = cached["total"]
+                continue
+        total = _fetch_ml_period_total(account_key, date_from, date_to)
+        if total is not None:
+            results[canal_id] = total
+            pc.setdefault(account_key, {})[period_key] = {
+                "total": total,
+                "fetched_at": datetime.now().isoformat(),
+            }
+
+    save_sales_history(history)
+    return jsonify({
+        "results": results,
+        "from": date_from,
+        "to": date_to,
+        "cached": not force,
+        "timestamp": datetime.now().isoformat(),
+    })
+
+@app.route("/api/sales/manual", methods=["POST"])
+@login_required
+def sales_save_manual():
+    """Salva os últimos valores digitados de Shopee/TikTok."""
+    data = request.get_json(force=True)
+    history = load_sales_history()
+    history["manual_last"] = data.get("values", {})
+    save_sales_history(history)
+    return jsonify({"ok": True})
+
+@app.route("/api/sales/manual")
+@login_required
+def sales_get_manual():
+    history = load_sales_history()
+    return jsonify(history.get("manual_last", {}))
 
 
 if __name__ == "__main__":
