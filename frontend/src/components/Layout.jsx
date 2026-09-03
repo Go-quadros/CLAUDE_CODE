@@ -9,6 +9,7 @@ const NAV = [
   { path: '/relatorios',label: 'Relatórios',          icon: '📊', section: 'Ferramentas' },
   { path: '/ads',       label: 'Ads Gap',             icon: '🎯', section: 'Ferramentas' },
   { path: '/titulos',   label: 'Gerador de Títulos',  icon: '✏️', section: 'Ferramentas' },
+  { path: '/feedbacks', label: 'Feedbacks Negativos', icon: '⚠️', section: 'Ferramentas' },
 ];
 
 const ADMIN_NAV = [

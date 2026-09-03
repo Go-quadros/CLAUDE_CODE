@@ -64,6 +64,18 @@ CREATE TABLE IF NOT EXISTS sales_cache (
   cached_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS feedbacks (
+  id          SERIAL PRIMARY KEY,
+  mlb         TEXT,
+  pedido_id   TEXT,
+  canal       TEXT,
+  motivo      TEXT,
+  descricao   TEXT,
+  status      TEXT NOT NULL DEFAULT 'pendente',
+  created_at  TIMESTAMPTZ DEFAULT NOW(),
+  resolved_at TIMESTAMPTZ
+);
+
 -- Seed default admin (password: goquadros2026)
 INSERT INTO users (username, password_hash, name, role)
 VALUES (

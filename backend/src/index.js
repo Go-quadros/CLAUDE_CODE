@@ -39,7 +39,8 @@ app.use('/api/sales',   require('./routes/sales'));
 app.use('/api/ads',     require('./routes/ads'));
 app.use('/api/ads-gap', require('./routes/ads'));       // alias
 app.use('/api/titulos', require('./routes/titles'));
-app.use('/api/reports', require('./routes/reports'));
+app.use('/api/reports',   require('./routes/reports'));
+app.use('/api/feedbacks', require('./routes/feedbacks'));
 
 // ML OAuth callback (redirect do ML → backend → frontend)
 app.use('/callback', require('./routes/ml'));

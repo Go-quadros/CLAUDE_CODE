@@ -59,3 +59,9 @@ export const saveAdsItems   = (key, b)   => api.post(`/api/ads/config/${key}/ite
 // Titles
 export const generateTitle  = (body)     => api.post('/api/titulos/gerar', body);
 export const getExistingTitles = ()      => api.get('/api/titulos/existentes');
+
+// Feedbacks
+export const getFeedbacks      = (params) => api.get(`/api/feedbacks${params ? '?'+new URLSearchParams(params) : ''}`);
+export const createFeedback    = (body)   => api.post('/api/feedbacks', body);
+export const updateFeedbackStatus = (id, status) => req('PATCH', `/api/feedbacks/${id}/status`, { status });
+export const deleteFeedback    = (id)     => api.delete(`/api/feedbacks/${id}`);

@@ -10,6 +10,7 @@ import Relatorios from './pages/Relatorios.jsx';
 import AdsGap from './pages/AdsGap.jsx';
 import Titulos from './pages/Titulos.jsx';
 import Usuarios from './pages/Usuarios.jsx';
+import Feedbacks from './pages/Feedbacks.jsx';
 
 export const AuthCtx = createContext(null);
 export function useAuth() { return useContext(AuthCtx); }
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="relatorios" element={<Relatorios />} />
             <Route path="ads" element={<AdsGap />} />
             <Route path="titulos" element={<Titulos />} />
+            <Route path="feedbacks" element={<Feedbacks />} />
             <Route path="usuarios" element={<MasterOnly><Usuarios /></MasterOnly>} />
           </Route>
         </Routes>
